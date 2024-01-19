@@ -538,7 +538,6 @@ class Shipments extends DolibarrApi
 		return $this->_cleanObjectDatas($this->shipment);
 	}
 
-
 	// /**
 	//  *  Classify the shipment as invoiced
 	//  *

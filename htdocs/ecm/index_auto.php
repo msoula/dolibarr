@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/treeview.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmdirectory.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("ecm", "companies", "other", "users", "orders", "propal", "bills", "contracts"));
+$langs->loadLangs(array("ecm", "companies", "other", "users", "orders", "propal", "bills", "contracts", "sendings"));
 
 // Get parameters
 $socid = GETPOST('socid', 'int');
@@ -378,6 +378,10 @@ if (empty($conf->global->ECM_AUTO_TREE_HIDEN)) {
 		$rowspan++; $sectionauto[] = array('position'=>210, 'level'=>1, 'module'=>'recruitment-recruitmentcandidature', 'test'=>isModEnabled('recruitment'), 'label'=>$langs->trans("Candidatures"), 'desc'=>$langs->trans("ECMDocsBy", $langs->transnoentitiesnoconv("JobApplications")));
 	}
 	$rowspan++; $sectionauto[] = array('position'=>220, 'level'=>1, 'module'=>'user', 'test'=>1, 'label'=>$langs->trans("Users"), 'desc'=>$langs->trans("ECMDocsBy", $langs->transnoentitiesnoconv("Users")));
+	if (isModEnabled('expedition')) {
+		$langs->load("expedition");
+		$rowspan++; $sectionauto[] = array('position'=>230, 'level'=>1, 'module'=>'expedition', 'test'=>isModEnabled('expedition'), 'label'=>$langs->trans("Shipments"), 'desc'=>$langs->trans("ECMDocsBy", $langs->transnoentitiesnoconv("Shipments")));
+	}
 
 	$parameters = array();
 	$reshook = $hookmanager->executeHooks('addSectionECMAuto', $parameters);

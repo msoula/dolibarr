@@ -40,7 +40,7 @@ class Interventions extends DolibarrApi
 	 */
 	public static $FIELDS = array(
 	  'socid',
-	  'fk_project',
+	  //'fk_project',
 	  'description',
 	);
 
@@ -289,7 +289,8 @@ class Interventions extends DolibarrApi
 			$id,
 			$this->fichinter->description,
 			$this->fichinter->date,
-			$this->fichinter->duree
+      $this->fichinter->duree,
+      $this->fichinter->array_options
 		);
 
 		if ($updateRes > 0) {

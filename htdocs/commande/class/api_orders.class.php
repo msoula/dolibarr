@@ -363,7 +363,7 @@ class Orders extends DolibarrApi
 			$request_data->info_bits,
 			$request_data->fk_remise_except,
 			$request_data->price_base_type ? $request_data->price_base_type : 'HT',
-			$request_data->subprice,
+			$request_data->price,
 			$request_data->date_start,
 			$request_data->date_end,
 			$request_data->product_type,

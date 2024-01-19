@@ -438,7 +438,7 @@ function show_list_sending_receive($origin, $origin_id, $filter = '')
 					include_once DOL_DOCUMENT_ROOT.'/delivery/class/delivery.class.php';
 					$expedition->id = $objp->sendingid;
 					$expedition->fetchObjectLinked($expedition->id, $expedition->element);
-					//var_dump($expedition->linkedObjects);
+					//var_dump($expedition->id);
 
 					$receiving = '';
 					if (!empty($expedition->linkedObjects['delivery'])) {

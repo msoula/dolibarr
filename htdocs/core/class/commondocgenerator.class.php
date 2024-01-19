@@ -1226,6 +1226,64 @@ abstract class CommonDocGenerator
 		return $rank;
 	}
 
+  /**
+   *  print barcode column content
+   *
+   *  @param  TCPDF   $pdf        pdf object
+   *  @param  float   $curY       curent Y position
+   *  @param  string    $colKey       the column key
+   *  @param  string    $barcodeText    barcode text
+   *  @return int             <0 if KO, >= if OK
+   */
+  public function printBarcodeColumnContent($pdf, &$curY, $colKey, $barcodetext = '', $barcodetype = 'EAN13')
+  {
+    global $hookmanager;
+
+    $barcodestyle = array(
+      'position' => '',
+      'align' => 'C',
+      'stretch' => false,
+      'fitwidth' => true,
+      'cellfitalign' => 'C',
+      'border' => false,
+      'hpadding' => '',
+      'vpadding' => '',
+      'fgcolor' => array(0,0,0),
+      'bgcolor' => false,
+      'text' => true,
+      'font' => 'helvetica',
+      'fontsize' => 8,
+      'stretchtext' => 4
+    );
+
+    $parameters = array(
+      'curY' => &$curY,
+      'columnText' => $barcodetext,
+      'colKey' => $colKey,
+      'pdf' => &$pdf,
+    );
+    $reshook = $hookmanager->executeHooks('printBarcodeColumnContent', $parameters, $this); // Note that $action and $object may have been modified by hook
+    if ($reshook < 0) {
+      setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+    }
+    if (!$reshook) {
+      if (empty($barcodetext)) {
+        return 0;
+      }
+      $pdf->SetXY($this->getColumnContentXStart($colKey), $curY); // Set curent position
+      $colDef = $this->cols[$colKey];
+      // save curent cell padding
+      $curentCellPaddings = $pdf->getCellPaddings();
+      // set cell padding with column content definition
+      $pdf->setCellPaddings(isset($colDef['content']['padding'][3]) ? $colDef['content']['padding'][3] : 0, isset($colDef['content']['padding'][0]) ? $colDef['content']['padding'][0] : 0, isset($colDef['content']['padding'][1]) ? $colDef['content']['padding'][1] : 0, isset($colDef['content']['padding'][2]) ? $colDef['content']['padding'][2] : 0);
+      $pdf->write1DBarcode($barcodetext, $barcodetype, isset($colDef['xStartPos']) ? $colDef['xStartPos'] : 0, $curY + 2, $colDef['width'], $colDef['height'] - 4, '', $barcodestyle);
+
+      // restore cell padding
+      $pdf->setCellPaddings($curentCellPaddings['L'], $curentCellPaddings['T'], $curentCellPaddings['R'], $curentCellPaddings['B']);
+    }
+
+    return 0;
+  }
 
 	/**
 	 *  print standard column content

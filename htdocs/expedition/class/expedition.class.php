@@ -402,13 +402,32 @@ class Expedition extends CommonObject
 				// Insert of lines
 				$num = count($this->lines);
 				for ($i = 0; $i < $num; $i++) {
-					if (empty($this->lines[$i]->product_type) || !empty($conf->global->STOCK_SUPPORTS_SERVICES)) {
-						if (!isset($this->lines[$i]->detail_batch)) {	// no batch management
-							if ($this->create_line($this->lines[$i]->entrepot_id, $this->lines[$i]->origin_line_id, $this->lines[$i]->qty, $this->lines[$i]->rang, $this->lines[$i]->array_options) <= 0) {
+					$line = $this->lines[$i];
+
+          // Test and convert into object.
+          // When coming from REST API, we may still have an array
+					if (!is_object($line)) {
+						$line = (object) $line;
+					}
+
+					if (empty($line->product_type) || !empty($conf->global->STOCK_SUPPORTS_SERVICES)) {
+						if (!isset($line->detail_batch)) {	// no batch management
+							if ($this->create_line($line->entrepot_id, $line->origin_line_id, $line->qty, $line->rang, $line->array_options) <= 0) {
 								$error++;
 							}
 						} else {	// with batch management
-							if ($this->create_line_batch($this->lines[$i], $this->lines[$i]->array_options) <= 0) {
+
+              // Test and convert into object.
+              // When coming from REST API, we may still have an array
+              $detbatchs = array();
+              foreach ($line->detail_batch as $batch) {
+                if (!is_object($batch)) {
+                  $batch = (object) $batch;
+                }
+                $detbatchs[] = $batch;
+              }
+
+							if ($this->create_line_batch($detbatchs, $line->origin_line_id, $line->rang, $line->array_options) <= 0) {
 								$error++;
 							}
 						}
@@ -507,36 +526,48 @@ class Expedition extends CommonObject
 	 * @param	array		$array_options		extrafields array
 	 * @return	int								<0 if KO, >0 if OK
 	 */
-	public function create_line_batch($line_ext, $array_options = 0)
+	public function create_line_batch($detbatchs, $origin_line_id, $rang, $array_options = 0)
 	{
+		//phpcs:enable
+		global $user;
+
 		// phpcs:enable
 		$error = 0;
-		$stockLocationQty = array(); // associated array with batch qty in stock location
+		$stockEntries = array(); // associated array with batch and total qty in stock location
 
-		$tab = $line_ext->detail_batch;
 		// create stockLocation Qty array
-		foreach ($tab as $detbatch) {
+		foreach ($detbatchs as $detbatch) {
 			if (!empty($detbatch->entrepot_id)) {
-				if (empty($stockLocationQty[$detbatch->entrepot_id])) {
-					$stockLocationQty[$detbatch->entrepot_id] = 0;
+
+        $stockEntry = $stockEntries[$detbatch->entrepot_id];
+				if (!isset($stockEntry)) {
+          $stockEntry = ['qty' => 0, 'detbatchs' => []];
 				}
-				$stockLocationQty[$detbatch->entrepot_id] += $detbatch->qty;
+				$stockEntry['qty'] += $detbatch->qty;
+				$stockEntry['detbatchs'][] = $detbatch;
+
+        $stockEntries[$detbatch->entrepot_id] = $stockEntry;
 			}
 		}
 		// create shipment lines
-		foreach ($stockLocationQty as $stockLocation => $qty) {
-			$line_id = $this->create_line($stockLocation, $line_ext->origin_line_id, $qty, $line_ext->rang, $array_options);
+		foreach ($stockEntries as $stockLocation => $stockEntry) {
+			$line_id = $this->create_line($stockLocation, $origin_line_id, $stockEntry['qty'], $rang, $array_options);
 			if ($line_id < 0) {
 				$error++;
 			} else {
 				// create shipment batch lines for stockLocation
-				foreach ($tab as $detbatch) {
-					if ($detbatch->entrepot_id == $stockLocation) {
-						if (!($detbatch->create($line_id) > 0)) {		// Create an ExpeditionLineBatch
-							$this->errors = $detbatch->errors;
-							$error++;
-						}
-					}
+				foreach ($stockEntry['detbatchs'] as $detbatch) {
+          $linebatch = new ExpeditionLineBatch($this->db);
+          $ret = $linebatch->fetchFromStock($detbatch->fk_origin_stock); // load serial, sellby, eatby
+          dol_syslog("$ret", LOG_INFO);
+          if ($ret > 0) {
+            $linebatch->qty = $detbatch->qty;
+            $ret = $linebatch->create($line_id, $user);
+          }
+
+          if ($res < 0) {
+            $error++;
+          }
 				}
 			}
 		}
@@ -1600,7 +1631,7 @@ class Expedition extends CommonObject
 
 
 				if ($originline > 0 && $originline == $obj->fk_origin_line) {
-					$line->entrepot_id = 0; // entrepod_id in details_entrepot
+					$line->entrepot_id = 0; // entrepot_id in details_entrepot
 					$line->qty_shipped += $obj->qty_shipped;
 				} else {
 					$line = new ExpeditionLigne($this->db);		// new group to start
@@ -2141,6 +2172,7 @@ class Expedition extends CommonObject
 			if ($this->origin == 'commande' && $this->origin_id > 0) {
 				$order = new Commande($this->db);
 				$order->fetch($this->origin_id);
+
 
 				$order->loadExpeditions(self::STATUS_CLOSED); // Fill $order->expeditions = array(orderlineid => qty)
 

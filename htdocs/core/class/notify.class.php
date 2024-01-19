@@ -443,7 +443,6 @@ class Notify
 		// Check notification fixed
 		// TODO Move part found after, into a sql here
 
-
 		// Loop on all notifications enabled
 		$result = $this->db->query($sql);
 		if ($result) {
@@ -501,7 +500,7 @@ class Notify
 								$object_type = 'order';
 								$mesg = $outputlangs->transnoentitiesnoconv("EMailTextOrderValidated", $link);
 								break;
-							case 'ORDER_CLOSE':
+              case 'ORDER_CLOSE':
 								$link = '<a href="'.$urlwithroot.'/commande/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
 								$dir_output = $conf->commande->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'commande');
 								$object_type = 'order';
@@ -636,13 +635,14 @@ class Notify
 
 						$ref = dol_sanitizeFileName($newref);
 						$pdf_path = $dir_output."/".$ref.".pdf";
+
 						if (!dol_is_file($pdf_path)||(is_object($arraydefaultmessage) && $arraydefaultmessage->id > 0 && !$arraydefaultmessage->joinfiles)) {
 							// We can't add PDF as it is not generated yet.
 							$filepdf = '';
 						} else {
 							$filepdf = $pdf_path;
 							$filename_list[] = $filepdf;
-							$mimetype_list[] = mime_content_type($filepdf);
+							//$mimetype_list[] = mime_content_type($filepdf);
 							$mimefilename_list[] = $ref.".pdf";
 						}
 

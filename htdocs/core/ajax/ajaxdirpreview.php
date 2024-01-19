@@ -217,7 +217,8 @@ if ($type == 'directory') {
 		'recruitment-recruitmentcandidature',
 		'banque',
 		'chequereceipt',
-		'mrp-mo'
+		'mrp-mo',
+    'expedition'
 	);
 
 	$parameters = array('modulepart'=>$module);
@@ -273,6 +274,8 @@ if ($type == 'directory') {
 		$upload_dir = $conf->bank->dir_output.'/checkdeposits';
 	} elseif ($module == 'mrp-mo') {
 		$upload_dir = $conf->mrp->dir_output;
+	} elseif ($module == 'expedition') {
+		$upload_dir = $conf->expedition->dir_output.'/sending';
 	} else {
 		$parameters = array('modulepart'=>$module);
 		$reshook = $hookmanager->executeHooks('addSectionECMAuto', $parameters);

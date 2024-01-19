@@ -566,7 +566,7 @@ class Commande extends CommonOrder
 				$error++;
 			}
 			// End call triggers
-		}
+    }
 
 		if (!$error) {
 			$this->oldref = $this->ref;

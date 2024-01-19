@@ -721,14 +721,12 @@ if (empty($reshook)) {
 								}
 							} else {
 								// create new line with new lot
-								$line->origin_line_id = $lines[$i]->origin_line_id;
-								$line->entrepot_id = $lotStock->warehouseid;
-								$line->detail_batch[0] = new ExpeditionLineBatch($db);
-								$line->detail_batch[0]->fk_origin_stock = $batch_id;
-								$line->detail_batch[0]->batch = $lotStock->batch;
-								$line->detail_batch[0]->entrepot_id = $lotStock->warehouseid;
-								$line->detail_batch[0]->qty = $batch_qty;
-								if ($object->create_line_batch($line, $line->array_options) < 0) {
+                $detail_batch = array(
+                  "fk_origin_stock" => $batch_id,
+                  "entrepot_id" => $lotStock->warehouseid,
+                  "qty" => $batch_qty
+                );
+								if ($object->create_line_batch($detail_batch, $lines[$i]->origin_line_id, $line->array_options) < 0) {
 									setEventMessages($object->error, $object->errors, 'errors');
 									$error++;
 								} else {
