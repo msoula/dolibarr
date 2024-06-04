@@ -539,10 +539,11 @@ class Expedition extends CommonObject
 		foreach ($detbatchs as $detbatch) {
 			if (!empty($detbatch->entrepot_id)) {
 
-        $stockEntry = $stockEntries[$detbatch->entrepot_id];
-				if (!isset($stockEntry)) {
+				if (!array_key_exists($detbatch->entrepot_id, $stockEntries)) {
           $stockEntry = ['qty' => 0, 'detbatchs' => []];
-				}
+        } else {
+          $stockEntry = $stockEntries[$detbatch->entrepot_id];
+        }
 				$stockEntry['qty'] += $detbatch->qty;
 				$stockEntry['detbatchs'][] = $detbatch;
 
@@ -559,14 +560,11 @@ class Expedition extends CommonObject
 				foreach ($stockEntry['detbatchs'] as $detbatch) {
           $linebatch = new ExpeditionLineBatch($this->db);
           $ret = $linebatch->fetchFromStock($detbatch->fk_origin_stock); // load serial, sellby, eatby
-          dol_syslog("$ret", LOG_INFO);
           if ($ret > 0) {
             $linebatch->qty = $detbatch->qty;
-            $ret = $linebatch->create($line_id, $user);
-          }
-
-          if ($res < 0) {
-            $error++;
+            if (0 > $linebatch->create($line_id, $user)) {
+              $error++;
+            }
           }
 				}
 			}
