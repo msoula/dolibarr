@@ -1245,159 +1245,168 @@ if ($action == 'create' && $user->rights->projet->creer) {
 	} else {
 		print dol_get_fiche_head($head, 'project', $langs->trans("Project"), -1, ($object->public ? 'projectpub' : 'project'));
 
-		// Project card
+    // NOTE(msoula): start of hook tabContentViewProject
+    // Call Hook tabContentViewProject
+    $parameters = array();
+    // Note that $action and $object may be modified by hook
+    $reshook = $hookmanager->executeHooks('tabContentViewProject', $parameters, $object, $action);
+    if (empty($reshook)) {
 
-		if (!empty($_SESSION['pageforbacktolist']) && !empty($_SESSION['pageforbacktolist']['project'])) {
-			$tmpurl = $_SESSION['pageforbacktolist']['project'];
-			$tmpurl = preg_replace('/__SOCID__/', $object->socid, $tmpurl);
-			$linkback = '<a href="'.$tmpurl.(preg_match('/\?/', $tmpurl) ? '&' : '?'). 'restore_lastsearch_values=1">'.$langs->trans("BackToList").'</a>';
-		} else {
-			$linkback = '<a href="'.DOL_URL_ROOT.'/projet/list.php?restore_lastsearch_values=1">'.$langs->trans("BackToList").'</a>';
-		}
+      // Project card
 
-		$morehtmlref = '<div class="refidno">';
-		// Title
-		$morehtmlref .= dol_escape_htmltag($object->title);
-		$morehtmlref .= '<br>';
-		// Thirdparty
-		if (!empty($object->thirdparty->id) && $object->thirdparty->id > 0) {
-			$morehtmlref .= $object->thirdparty->getNomUrl(1, 'project');
-		}
-		$morehtmlref .= '</div>';
+      if (!empty($_SESSION['pageforbacktolist']) && !empty($_SESSION['pageforbacktolist']['project'])) {
+        $tmpurl = $_SESSION['pageforbacktolist']['project'];
+        $tmpurl = preg_replace('/__SOCID__/', $object->socid, $tmpurl);
+        $linkback = '<a href="'.$tmpurl.(preg_match('/\?/', $tmpurl) ? '&' : '?'). 'restore_lastsearch_values=1">'.$langs->trans("BackToList").'</a>';
+      } else {
+        $linkback = '<a href="'.DOL_URL_ROOT.'/projet/list.php?restore_lastsearch_values=1">'.$langs->trans("BackToList").'</a>';
+      }
 
-		// Define a complementary filter for search of next/prev ref.
-		if (empty($user->rights->projet->all->lire)) {
-			$objectsListId = $object->getProjectsAuthorizedForUser($user, 0, 0);
-			$object->next_prev_filter = "rowid IN (".$db->sanitize(count($objectsListId) ? join(',', array_keys($objectsListId)) : '0').")";
-		}
+      $morehtmlref = '<div class="refidno">';
+      // Title
+      $morehtmlref .= dol_escape_htmltag($object->title);
+      $morehtmlref .= '<br>';
+      // Thirdparty
+      if (!empty($object->thirdparty->id) && $object->thirdparty->id > 0) {
+        $morehtmlref .= $object->thirdparty->getNomUrl(1, 'project');
+      }
+      $morehtmlref .= '</div>';
 
-		dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+      // Define a complementary filter for search of next/prev ref.
+      if (empty($user->rights->projet->all->lire)) {
+        $objectsListId = $object->getProjectsAuthorizedForUser($user, 0, 0);
+        $object->next_prev_filter = "rowid IN (".$db->sanitize(count($objectsListId) ? join(',', array_keys($objectsListId)) : '0').")";
+      }
 
-		print '<div class="fichecenter">';
-		print '<div class="fichehalfleft">';
-		print '<div class="underbanner clearboth"></div>';
+      dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
 
-		print '<table class="border tableforfield centpercent">';
+      print '<div class="fichecenter">';
+      print '<div class="fichehalfleft">';
+      print '<div class="underbanner clearboth"></div>';
 
-		// Usage
-		if (!empty($conf->global->PROJECT_USE_OPPORTUNITIES) || empty($conf->global->PROJECT_HIDE_TASKS) || isModEnabled('eventorganization')) {
-			print '<tr><td class="tdtop">';
-			print $langs->trans("Usage");
-			print '</td>';
-			print '<td>';
-			if (!empty($conf->global->PROJECT_USE_OPPORTUNITIES)) {
-				print '<input type="checkbox" disabled name="usage_opportunity"'.(GETPOSTISSET('usage_opportunity') ? (GETPOST('usage_opportunity', 'alpha') != '' ? ' checked="checked"' : '') : ($object->usage_opportunity ? ' checked="checked"' : '')).'> ';
-				$htmltext = $langs->trans("ProjectFollowOpportunity");
-				print $form->textwithpicto($langs->trans("ProjectFollowOpportunity"), $htmltext);
-				print '<br>';
-			}
-			if (empty($conf->global->PROJECT_HIDE_TASKS)) {
-				print '<input type="checkbox" disabled name="usage_task"'.(GETPOSTISSET('usage_task') ? (GETPOST('usage_task', 'alpha') != '' ? ' checked="checked"' : '') : ($object->usage_task ? ' checked="checked"' : '')).'> ';
-				$htmltext = $langs->trans("ProjectFollowTasks");
-				print $form->textwithpicto($langs->trans("ProjectFollowTasks"), $htmltext);
-				print '<br>';
-			}
-			if (empty($conf->global->PROJECT_HIDE_TASKS) && !empty($conf->global->PROJECT_BILL_TIME_SPENT)) {
-				print '<input type="checkbox" disabled name="usage_bill_time"'.(GETPOSTISSET('usage_bill_time') ? (GETPOST('usage_bill_time', 'alpha') != '' ? ' checked="checked"' : '') : ($object->usage_bill_time ? ' checked="checked"' : '')).'> ';
-				$htmltext = $langs->trans("ProjectBillTimeDescription");
-				print $form->textwithpicto($langs->trans("BillTime"), $htmltext);
-				print '<br>';
-			}
+      print '<table class="border tableforfield centpercent">';
 
-			if (isModEnabled('eventorganization')) {
-				print '<input type="checkbox" disabled name="usage_organize_event"'.(GETPOSTISSET('usage_organize_event') ? (GETPOST('usage_organize_event', 'alpha') != '' ? ' checked="checked"' : '') : ($object->usage_organize_event ? ' checked="checked"' : '')).'> ';
-				$htmltext = $langs->trans("EventOrganizationDescriptionLong");
-				print $form->textwithpicto($langs->trans("ManageOrganizeEvent"), $htmltext);
-			}
-			print '</td></tr>';
-		}
+      // Usage
+      if (!empty($conf->global->PROJECT_USE_OPPORTUNITIES) || empty($conf->global->PROJECT_HIDE_TASKS) || isModEnabled('eventorganization')) {
+        print '<tr><td class="tdtop">';
+        print $langs->trans("Usage");
+        print '</td>';
+        print '<td>';
+        if (!empty($conf->global->PROJECT_USE_OPPORTUNITIES)) {
+          print '<input type="checkbox" disabled name="usage_opportunity"'.(GETPOSTISSET('usage_opportunity') ? (GETPOST('usage_opportunity', 'alpha') != '' ? ' checked="checked"' : '') : ($object->usage_opportunity ? ' checked="checked"' : '')).'> ';
+          $htmltext = $langs->trans("ProjectFollowOpportunity");
+          print $form->textwithpicto($langs->trans("ProjectFollowOpportunity"), $htmltext);
+          print '<br>';
+        }
+        if (empty($conf->global->PROJECT_HIDE_TASKS)) {
+          print '<input type="checkbox" disabled name="usage_task"'.(GETPOSTISSET('usage_task') ? (GETPOST('usage_task', 'alpha') != '' ? ' checked="checked"' : '') : ($object->usage_task ? ' checked="checked"' : '')).'> ';
+          $htmltext = $langs->trans("ProjectFollowTasks");
+          print $form->textwithpicto($langs->trans("ProjectFollowTasks"), $htmltext);
+          print '<br>';
+        }
+        if (empty($conf->global->PROJECT_HIDE_TASKS) && !empty($conf->global->PROJECT_BILL_TIME_SPENT)) {
+          print '<input type="checkbox" disabled name="usage_bill_time"'.(GETPOSTISSET('usage_bill_time') ? (GETPOST('usage_bill_time', 'alpha') != '' ? ' checked="checked"' : '') : ($object->usage_bill_time ? ' checked="checked"' : '')).'> ';
+          $htmltext = $langs->trans("ProjectBillTimeDescription");
+          print $form->textwithpicto($langs->trans("BillTime"), $htmltext);
+          print '<br>';
+        }
 
-		// Visibility
-		print '<tr><td class="titlefield">'.$langs->trans("Visibility").'</td><td>';
-		if ($object->public) {
-			print img_picto($langs->trans('SharedProject'), 'world', 'class="paddingrightonly"');
-			print $langs->trans('SharedProject');
-		} else {
-			print img_picto($langs->trans('PrivateProject'), 'private', 'class="paddingrightonly"');
-			print $langs->trans('PrivateProject');
-		}
-		print '</td></tr>';
+        if (isModEnabled('eventorganization')) {
+          print '<input type="checkbox" disabled name="usage_organize_event"'.(GETPOSTISSET('usage_organize_event') ? (GETPOST('usage_organize_event', 'alpha') != '' ? ' checked="checked"' : '') : ($object->usage_organize_event ? ' checked="checked"' : '')).'> ';
+          $htmltext = $langs->trans("EventOrganizationDescriptionLong");
+          print $form->textwithpicto($langs->trans("ManageOrganizeEvent"), $htmltext);
+        }
+        print '</td></tr>';
+      }
 
-		if (!empty($conf->global->PROJECT_USE_OPPORTUNITIES) && !empty($object->usage_opportunity)) {
-			// Opportunity status
-			print '<tr><td>'.$langs->trans("OpportunityStatus").'</td><td>';
-			$code = dol_getIdFromCode($db, $object->opp_status, 'c_lead_status', 'rowid', 'code');
-			if ($code) {
-				print $langs->trans("OppStatus".$code);
-			}
+      // Visibility
+      print '<tr><td class="titlefield">'.$langs->trans("Visibility").'</td><td>';
+      if ($object->public) {
+        print img_picto($langs->trans('SharedProject'), 'world', 'class="paddingrightonly"');
+        print $langs->trans('SharedProject');
+      } else {
+        print img_picto($langs->trans('PrivateProject'), 'private', 'class="paddingrightonly"');
+        print $langs->trans('PrivateProject');
+      }
+      print '</td></tr>';
 
-			// Opportunity percent
-			print ' <span title="'.$langs->trans("OpportunityProbability").'"> / ';
-			if (strcmp($object->opp_percent, '')) {
-				print price($object->opp_percent, 0, $langs, 1, 0).' %';
-			}
-			print '</span></td></tr>';
+      if (!empty($conf->global->PROJECT_USE_OPPORTUNITIES) && !empty($object->usage_opportunity)) {
+        // Opportunity status
+        print '<tr><td>'.$langs->trans("OpportunityStatus").'</td><td>';
+        $code = dol_getIdFromCode($db, $object->opp_status, 'c_lead_status', 'rowid', 'code');
+        if ($code) {
+          print $langs->trans("OppStatus".$code);
+        }
 
-			// Opportunity Amount
-			print '<tr><td>'.$langs->trans("OpportunityAmount").'</td><td>';
-			if (strcmp($object->opp_amount, '')) {
-				print '<span class="amount">'.price($object->opp_amount, 0, $langs, 1, 0, -1, $conf->currency).'</span>';
-				if (strcmp($object->opp_percent, '')) {
-					print ' &nbsp; &nbsp; &nbsp; <span title="'.dol_escape_htmltag($langs->trans('OpportunityWeightedAmount')).'"><span class="opacitymedium">'.$langs->trans("Weighted").'</span>: <span class="amount">'.price($object->opp_amount * $object->opp_percent / 100, 0, $langs, 1, 0, -1, $conf->currency).'</span></span>';
-				}
-			}
-			print '</td></tr>';
-		}
+        // Opportunity percent
+        print ' <span title="'.$langs->trans("OpportunityProbability").'"> / ';
+        if (strcmp($object->opp_percent, '')) {
+          print price($object->opp_percent, 0, $langs, 1, 0).' %';
+        }
+        print '</span></td></tr>';
 
-		// Budget
-		print '<tr><td>'.$langs->trans("Budget").'</td><td>';
-		if (!is_null($object->budget_amount) && strcmp($object->budget_amount, '')) {
-			print '<span class="amount">'.price($object->budget_amount, 0, $langs, 1, 0, 0, $conf->currency).'</span>';
-		}
-		print '</td></tr>';
+        // Opportunity Amount
+        print '<tr><td>'.$langs->trans("OpportunityAmount").'</td><td>';
+        if (strcmp($object->opp_amount, '')) {
+          print '<span class="amount">'.price($object->opp_amount, 0, $langs, 1, 0, -1, $conf->currency).'</span>';
+          if (strcmp($object->opp_percent, '')) {
+            print ' &nbsp; &nbsp; &nbsp; <span title="'.dol_escape_htmltag($langs->trans('OpportunityWeightedAmount')).'"><span class="opacitymedium">'.$langs->trans("Weighted").'</span>: <span class="amount">'.price($object->opp_amount * $object->opp_percent / 100, 0, $langs, 1, 0, -1, $conf->currency).'</span></span>';
+          }
+        }
+        print '</td></tr>';
+      }
 
-		// Date start - end project
-		print '<tr><td>'.$langs->trans("Dates").'</td><td>';
-		$start = dol_print_date($object->date_start, 'day');
-		print ($start ? $start : '?');
-		$end = dol_print_date($object->date_end, 'day');
-		print ' <span class="opacitymedium">-</span> ';
-		print ($end ? $end : '?');
-		if ($object->hasDelay()) {
-			print img_warning("Late");
-		}
-		print '</td></tr>';
+      // Budget
+      print '<tr><td>'.$langs->trans("Budget").'</td><td>';
+      if (!is_null($object->budget_amount) && strcmp($object->budget_amount, '')) {
+        print '<span class="amount">'.price($object->budget_amount, 0, $langs, 1, 0, 0, $conf->currency).'</span>';
+      }
+      print '</td></tr>';
 
-		// Other attributes
-		$cols = 2;
-		include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_view.tpl.php';
+      // Date start - end project
+      print '<tr><td>'.$langs->trans("Dates").'</td><td>';
+      $start = dol_print_date($object->date_start, 'day');
+      print ($start ? $start : '?');
+      $end = dol_print_date($object->date_end, 'day');
+      print ' <span class="opacitymedium">-</span> ';
+      print ($end ? $end : '?');
+      if ($object->hasDelay()) {
+        print img_warning("Late");
+      }
+      print '</td></tr>';
 
-		print '</table>';
+      // Other attributes
+      $cols = 2;
+      include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_view.tpl.php';
 
-		print '</div>';
-		print '<div class="fichehalfright">';
-		print '<div class="underbanner clearboth"></div>';
+      print '</table>';
 
-		print '<table class="border tableforfield centpercent">';
+      print '</div>';
+      print '<div class="fichehalfright">';
+      print '<div class="underbanner clearboth"></div>';
 
-		// Description
-		print '<td class="titlefield tdtop">'.$langs->trans("Description").'</td><td>';
-		print dol_htmlentitiesbr($object->description);
-		print '</td></tr>';
+      print '<table class="border tableforfield centpercent">';
 
-		// Categories
-		if (isModEnabled('categorie')) {
-			print '<tr><td class="valignmiddle">'.$langs->trans("Categories").'</td><td>';
-			print $form->showCategories($object->id, Categorie::TYPE_PROJECT, 1);
-			print "</td></tr>";
-		}
+      // Description
+      print '<td class="titlefield tdtop">'.$langs->trans("Description").'</td><td>';
+      print dol_htmlentitiesbr($object->description);
+      print '</td></tr>';
 
-		print '</table>';
+      // Categories
+      if (isModEnabled('categorie')) {
+        print '<tr><td class="valignmiddle">'.$langs->trans("Categories").'</td><td>';
+        print $form->showCategories($object->id, Categorie::TYPE_PROJECT, 1);
+        print "</td></tr>";
+      }
 
-		print '</div>';
-		print '</div>';
+      print '</table>';
 
-		print '<div class="clearboth"></div>';
+      print '</div>';
+      print '</div>';
+
+      print '<div class="clearboth"></div>';
+    }
+    // NOTE(msoula): end of hook tabContentViewProject
 	}
 
 	print dol_get_fiche_end();
