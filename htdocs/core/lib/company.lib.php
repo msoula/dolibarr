@@ -151,8 +151,18 @@ function societe_prepare_head(Societe $object)
 		} else {
 			$sql = "SELECT COUNT(n.rowid) as nb";
 			$sql .= " FROM ".MAIN_DB_PREFIX."projet as n";
-			$sql .= " WHERE fk_soc = ".((int) $object->id);
-			$sql .= " AND entity IN (".getEntity('project').")";
+
+			$parameters = array('function'=>'show_projects', 'projet_alias' => 'n');
+			$reshook = $hookmanager->executeHooks('selectThirdpartyProjectListFrom', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+			$sql .= $hookmanager->resPrint;
+
+			$sql .= " WHERE (fk_soc = ".((int) $object->id);
+
+			$parameters = array('function'=>'show_projects', 'projet_alias' => 'n');
+			$reshook = $hookmanager->executeHooks('selectThirdpartyProjectListWhere', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+			$sql .= $hookmanager->resPrint;
+
+			$sql .= ") AND entity IN (".getEntity('project').")";
 			$resql = $db->query($sql);
 			if ($resql) {
 				$obj = $db->fetch_object($resql);
@@ -848,9 +858,20 @@ function show_projects($conf, $langs, $db, $object, $backtopage = '', $nocreatel
 		$sql  = "SELECT p.rowid as id, p.entity, p.title, p.ref, p.public, p.dateo as do, p.datee as de, p.fk_statut as status, p.fk_opp_status, p.opp_amount, p.opp_percent, p.tms as date_update, p.budget_amount";
 		$sql .= ", cls.code as opp_status_code";
 		$sql .= " FROM ".MAIN_DB_PREFIX."projet as p";
+
+		$parameters = array('function'=>'show_projects');
+		$reshook = $hookmanager->executeHooks('selectThirdpartyProjectListFrom', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+		$sql .= $hookmanager->resPrint;
+
 		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."c_lead_status as cls on p.fk_opp_status = cls.rowid";
-		$sql .= " WHERE p.fk_soc = ".((int) $object->id);
-		$sql .= " AND p.entity IN (".getEntity('project').")";
+		$sql .= " WHERE (p.fk_soc = ".((int) $object->id);
+
+		$parameters = array('function'=>'show_projects');
+		$reshook = $hookmanager->executeHooks('selectThirdpartyProjectListWhere', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+		$sql .= $hookmanager->resPrint;
+
+		$sql .= ") AND p.entity IN (".getEntity('project').")";
+
 		$sql .= " ORDER BY p.dateo DESC";
 
 		$result = $db->query($sql);
@@ -957,7 +978,7 @@ function show_projects($conf, $langs, $db, $object, $backtopage = '', $nocreatel
 					$i++;
 				}
 			} else {
-				print '<tr class="oddeven"><td colspan="8"><span class="opacitymedium">'.$langs->trans("None").'</span></td></tr>';
+				print '<tr class="oddeven"><td colspan="9"><span class="opacitymedium">'.$langs->trans("None").'</span></td></tr>';
 			}
 			$db->free($result);
 		} else {

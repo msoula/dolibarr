@@ -129,6 +129,16 @@ if ($permission) {
 	}
 
 	if (empty($hideaddcontactforthirdparty)) {
+
+		$reshook = 0;
+		// Call Hook contactsTplThirdparties
+		if (is_object($hookmanager)) {
+			$hookmanager->initHooks(array('contacttpl'));
+			$parameters = array();
+			// Note that $action and $object may be modified by hook
+			$reshook = $hookmanager->executeHooks('contactsTplThirdparties', $parameters, $object, $action);
+		}
+		if (empty($reshook)) {
 		?>
 
 	<form class="tagtr pair nohover" action="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id; ?>" method="POST">
@@ -174,6 +184,7 @@ if ($permission) {
 	</form>
 
 		<?php
+		}
 	}
 
 	print "</div>";
