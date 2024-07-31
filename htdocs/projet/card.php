@@ -562,14 +562,14 @@ if ($action == 'create' && $user->rights->projet->creer) {
 	print '<input type="hidden" name="backtopagejsfields" value="'.$backtopagejsfields.'">';
 	print '<input type="hidden" name="dol_openinpopup" value="'.$dol_openinpopup.'">';
 
-	print dol_get_fiche_head();
-
 	// NOTE(msoula): start of hook tabContentCreateProject
 	// Call Hook tabContentCreateProject
 	$parameters = array();
 	// Note that $action and $object may be modified by hook
 	$reshook = $hookmanager->executeHooks('tabContentCreateProject', $parameters, $object, $action);
 	if (empty($reshook)) {
+
+    print dol_get_fiche_head();
 
 		print '<table class="border centpercent tableforfieldcreate">';
 
@@ -849,12 +849,12 @@ if ($action == 'create' && $user->rights->projet->creer) {
 		}
 
 		print '</table>';
+
+    print dol_get_fiche_end();
+
+    print $form->buttonsSaveCancel('CreateDraft');
 	}
 	// NOTE(msoula): end of hook tabContentCreateProject
-
-	print dol_get_fiche_end();
-
-	print $form->buttonsSaveCancel('CreateDraft');
 
 	print '</form>';
 
