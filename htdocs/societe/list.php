@@ -429,7 +429,11 @@ if (empty($reshook)) {
 	$permissiontodelete = $user->hasRight('societe', 'supprimer');
 	$permissiontoadd = $user->hasRight("societe", "creer");
 	$uploaddir = $conf->societe->dir_output;
-	include DOL_DOCUMENT_ROOT.'/core/actions_massactions.inc.php';
+	$trackid = 'thi'.$object->id;
+	$reshook = $hookmanager->executeHooks('doActionsMassActions', $parameters, $object, $action);
+	if (empty($reshook)) {
+		include DOL_DOCUMENT_ROOT.'/core/actions_massactions.inc.php';
+	}
 
 	if ($action == 'setstcomm') {
 		$object = new Client($db);
