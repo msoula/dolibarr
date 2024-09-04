@@ -560,7 +560,15 @@ if (!$error && $massaction == 'confirm_presend') {
 
 					// Send mail (substitutionarray must be done just before this)
 					require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
-					$mailfile = new CMailFile($subjectreplaced, $sendto, $from, $messagereplaced, $filepath, $mimetype, $filename, $sendtocc, $sendtobcc, $deliveryreceipt, -1, '', '', $trackid, '', $sendcontext, '', $upload_dir_tmp);
+
+					$classname = 'CMailFile';
+					$reshook = $hookmanager->executeHooks('doCreateCMailFileInstance', $parameters, $object, $action);
+					if (!empty($reshook)) {
+						require_once $hookmanager->resArray['script_path'];
+						$classname = $hookmanager->resArray['classname'];
+					}
+					$mailfile = new $classname($subjectreplaced, $sendto, $from, $messagereplaced, $filepath, $mimetype, $filename, $sendtocc, $sendtobcc, $deliveryreceipt, -1, '', '', $trackid, '', $sendcontext, '', $upload_dir_tmp);
+
 					if ($mailfile->error) {
 						$resaction .= '<div class="error">'.$mailfile->error.'</div>';
 					} else {
@@ -1643,7 +1651,14 @@ if (!$error && ($massaction == 'approveleave' || ($action == 'approveleave' && $
 						$trackid = 'leav'.$objecttmp->id;
 
 						require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
-						$mail = new CMailFile($subject, $emailTo, $emailFrom, $message, array(), array(), array(), '', '', 0, 0, '', '', $trackid);
+
+						$classname = 'CMailFile';
+						$reshook = $hookmanager->executeHooks('doCreateCMailFileInstance', $parameters, $object, $action);
+						if (!empty($reshook)) {
+							require_once $hookmanager->resArray['script_path'];
+							$classname = $hookmanager->resArray['classname'];
+						}
+						$mail = new $classname($subject, $emailTo, $emailFrom, $message, array(), array(), array(), '', '', 0, 0, '', '', $trackid);
 
 						// Sending email
 						$result = $mail->sendfile();

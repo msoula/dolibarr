@@ -371,7 +371,14 @@ if (($action == 'send' || $action == 'relance') && !GETPOST('addfile') && !GETPO
 			if (empty($sendcontext)) {
 				$sendcontext = 'standard';
 			}
-			$mailfile = new CMailFile($subject, $sendto, $from, $message, $filepath, $mimetype, $filename, $sendtocc, $sendtobcc, $deliveryreceipt, -1, '', '', $trackid, '', $sendcontext, '', $upload_dir_tmp);
+
+			$classname = 'CMailFile';
+			$reshook = $hookmanager->executeHooks('doCreateCMailFileInstance', $parameters, $object, $action);
+			if (!empty($reshook)) {
+				require_once $hookmanager->resArray['script_path'];
+				$classname = $hookmanager->resArray['classname'];
+			}
+			$mailfile = new $classname($subject, $sendto, $from, $message, $filepath, $mimetype, $filename, $sendtocc, $sendtobcc, $deliveryreceipt, -1, '', '', $trackid, '', $sendcontext, '', $upload_dir_tmp);
 
 			if (!empty($mailfile->error) || !empty($mailfile->errors)) {
 				setEventMessages($mailfile->error, $mailfile->errors, 'errors');
