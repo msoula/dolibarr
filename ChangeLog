@@ -3,6 +3,77 @@ English Dolibarr ChangeLog
 --------------------------------------------------------------
 
 
+***** ChangeLog for 19.0.3 compared to 19.0.2 *****
+FIX: #29403 HRM - Unable to delete a skill in a job Profile (#29779)
+FIX: #29439 incomplete API return (#29796)
+FIX: #29756 Sql error on comment search (#29761)
+FIX: #29780 Restore filtes when using "back to list"
+FIX: #30010 : Use conf TICKET_MESSAGE_MAIL_INTRO instead of translation key (#30081)
+FIX: #30274 : Add the include before executing dolibarr_set_const (#30320)
+FIX: #30467
+FIX: #30576 - Salary payment - Date of the payment is not displayed (#30592)
+FIX: Accountancy - Avoid space on FEC name file (#29716)
+FIX: Accountancy - Generate entries of expense report with localtax (#30411)
+FIX: ASSET: annual depreciation starting year (Again ;-)) #26084 (#30040)
+FIX: Backport page inventory.php from v18 to fix pagination bugs causing data loss (#29688)
+FIX: back to page on error in contact card (#29627)
+FIX: Bad calculation of $nbtotalofrecord (#30183)
+FIX: Bad count of total of supplie rinvoice into the list
+FIX: Better compatibility when objectdesc is not valid, and warnings
+FIX: broken pdf preview when multicompany sharing (#30188)
+FIX: compatibility with MULTICOMPANY_TRANSVERSE_MODE (#30599)
+FIX: Conflict with autoload (#30399)
+FIX: Display the real_PMP on inventory when its value is equal to 0 (#22291)
+FIX: Error mesg show untranslated extrafield name (#30227)
+FIX: executeHooks $object default value (#29647)
+FIX: expedition PDF models using units labels (#30358)
+FIX: Extrafield intshowzero in list (#29789)
+FIX: Extrafields always been delete and re insert for categories (#29781)
+FIX: extrafields on Organized events was broken
+FIX: fatal error on loading pictures in attached documents of an event (#30553)
+FIX: for country type (#29745)
+FIX: group by qty in product margin tab (#29853)
+FIX: init total amounts in margin module (#29854)
+FIX: issue to get the right files exported in Quadratrus export.php (#30004)
+FIX: lang output for sales representative on PDF (#30469)
+FIX: langs in common docgenerator (#29774)
+FIX: langs overwrite (#29630)
+FIX: lettering (auto) for invoice deposit with company discount (#29633)
+FIX: missing $object and $action for hook parameters (#30484)
+FIX: Missing $param in hook call for list
+FIX: Missing expense report picto in list (#29917)
+FIX: Missing expense report picto in menu (#29908)
+FIX: Missing the description in tooltip when option show in tooltip on
+FIX: mo cloning (#29686)
+FIX: modification date from label in accounting bookkeeping list (#30038)
+FIX: move porpale ref pdf cornas (#29989)
+FIX: Not qualified lines for reception (#29473)
+FIX: on change ref for bank account attachement are lost (#30529)
+FIX: orders to bill menu (#30179)
+FIX: Page expands when ticket messages are too long (#29785)
+FIX: parameter name (#29666)
+FIX: PHP8 warning if $conf->reception is checked the old fashion way (#29697)
+FIX: PHP 8 warning on output of successful cronjob (#29922)
+FIX: PHP exception on getSpecialCode (#29646)
+FIX: php warning if cookie doesn’t exist (#29723)
+FIX: pos: invoice date incorrectly set beacause of timezome mismatches (reverts #36e91da) (#30184)
+FIX: public project form return an error if SOCIETE_EMAIL_UNIQUE (#29942)
+FIX: REPLENISH MANY FOURN WHEN ORDER ALREADY CREATE (#29710)
+FIX: Supplier Order search on date valid (#30448)
+FIX: Ternary operator condition is always true/false (#29649)
+FIX: to avoid error during upgrade with pgsql (#30443)
+FIX: transfer in accountancy for expense reports.
+FIX: unitialised var (#29728)
+FIX: - Unknown Character on HTML (#30257)
+FIX: Unsigned propal having signing date (#29825)
+FIX: Update asset.class.php
+FIX: update date_echeance of supplier invoices when we update invoice date in the past (#29886)
+FIX: User List - Function is show in wrong column when module HRM enabled (#30186)
+FIX: var name error and remove useless code (#30601)
+FIX: Warning: Undefined property: PropaleLigne::$situation_percent in /home/httpd/vhosts/aflac.fr/domains/dol190.aflac.fr/httpdocs/core/lib/pdf.lib.php on line 2442 (#30033)
+FIX: wrong value for duration unit (#30261)
+FIX: ZAR currency must show the R before the amount
+
 ***** ChangeLog for 19.0.2 compared to 19.0.1 *****
 FIX: $object->oldcopy may be a stdClass and not original object
 FIX: 16.0 - parent company gets emptied when updating a third party from the card in edit mode (#28269)
@@ -13,7 +84,7 @@ FIX: #24265 regression cannot see all product on takepos (#28753)
 FIX: #26015
 FIX: #28205
 FIX: #28251 Fixing subpermission name on api_multicurrencies.class.php (#28252)
-FIX: #28347 FIX: #28962 FIX: #29224  FIX: #29035  (#29303)
+FIX: #28347 FIX: occurred#28962 FIX: #29224  FIX: #29035  (#29303)
 FIX: #28369
 FIX: #28429
 FIX: #28491 (#28522)
@@ -37,7 +108,7 @@ FIX: Adding the dependencies list feature for extrafields "select" (#28549)
 FIX: Add new hidden conf "DISABLE_QTY_OVERWRITTEN" (#28523)
 FIX: Amount of localtaxes in foreign currency was wrong on screen and PDF
 FIX: an error in a complex else condition
-FIX: an error occured when doing a mass vat change de 0% on supplier invoice (#29417)
+FIX: an error occurred when doing a mass vat change de 0% on supplier invoice (#29417)
 FIX: avoid error "Column 'entity' in where clause is ambiguous" (#28270)
 FIX: avoid php warnings (#29247)
 FIX: avoid to delete "lock" and "unlock" files
@@ -50,7 +121,7 @@ FIX: Bad CRLF when sending text only content. Fix dol_htmlwithnojs()
 FIX: Bad management on error creation of bookkeeping
 FIX: Bad picto on list of permission of a user when user not admin
 FIX: bad search on _ char in like when Debugbar is on
-FIX: bad timzeone for the start/end date of an event
+FIX: bad timezone for the start/end date of an event
 FIX: Better test on validity of compute field syntax with parenthesis
 FIX: Blank list when contract was checked in list of tickets (#29528)
 FIX: Button for disabled modules must not appear.
@@ -63,7 +134,7 @@ FIX: Count of virtual stock at Services and MoLine with disabled stock change (#
 FIX: css of background of modules that was black
 FIX: default workstation on BOM
 FIX: disabled pito of menu must be greyed.
-FIX: Display the date according to user language on subsitutions (#29510)
+FIX: Display the date according to user language on substitutions (#29510)
 FIX: Don't display column when it's out of date (#28271)
 FIX: duplicate error check (#29433)
 FIX: duplicate with lines: 414-416 (#28358)
@@ -73,7 +144,7 @@ FIX: Ergonomic fail  part02 (#29373)
 FIX: Error When cloning fourn price no default value for tva_tx (#28368)
 FIX: Error when updating user (#29304)
 FIX: fatal error Unsupported operand types when recording load payment
-FIX: Fix create shipping with product who have negative stocks on warehouse but the negative stock transfert is allowed (#26217)
+FIX: Fix create shipping with product who have negative stocks on warehouse but the negative stock transfer is allowed (#26217)
 FIX: Fix save directory for invoice ODT and multientities
 FIX: hasRight function
 FIX: Hide number beside select contract & added langs to translate c… (#29529)
@@ -152,7 +223,7 @@ FIX: Undefined array key default on fields (#29243)
 FIX: upload odt files should not start/end with space
 FIX: use $conf->browser->os instead
 FIX: used hasRight function
-FIX: Value of field int = 0 from modulebuilder must nto be set to null
+FIX: Value of field int = 0 from modulebuilder must not be set to null
 FIX: We should be able to add a workstation on bom lines (#29361 #29360)
 fix: when invoice is created by WORKFLOW_ORDER_AUTOCREATE_INVOICE on ORDER_NEW, the invoice must have the default bank account of the thirdparty is it's empty on order
 FIX: wrong array key (#29317)
@@ -2389,7 +2460,7 @@ FIX: Button text on proposal card for create a invoice
 FIX: calculateCosts of BOM must not be included into fetch
 FIX: calculation of balance in conciliation page on desc sorting.
 FIX: card.php
-FIX: Change date format of the inventorycode to be equal as mass stock transfert
+FIX: Change date format of the inventorycode to be equal as mass stock transfer
 FIX: check if greater 0
 FIX: close cash with some terminals in TakePOS
 FIX: compatibility with Multicompany
@@ -7171,7 +7242,7 @@ FIX: #6253 Supplier invoice list filter does not respect "thirdparty" filter
 FIX: #6277
 FIX: project list and ajax completion return wrong list.
 FIX: bug margin calculation by user with multicompany
-FIX: Can make a stock transfert on product not on sale/purchase.
+FIX: Can make a stock transfer on product not on sale/purchase.
 FIX: extrafield input for varchar was not working with special char within (ie double quotes)
 FIX: javascript error
 FIX: link for not found photo when using gravatar. Must use external url.
@@ -7651,7 +7722,7 @@ FIX: Check of EAN13 barcode when mask was set to use 13 digits instead of 12
 FIX: correct display of minimum buying price
 FIX: Creation of thumb image for size "small" was not done.
 FIX: Damn, where was the project ref ?
-FIX: Default vat is not set correctly when an error occured and we use VAT identified by a code.
+FIX: Default vat is not set correctly when an error occurred and we use VAT identified by a code.
 FIX: dont retrieve new buying price on margin display
 FIX: Duplicate records into export
 FIX: Each time we edit a line, we loose the unit price.
@@ -10410,7 +10481,7 @@ For developers:
 - Can protect a module to not being enabled if javascript disabled.
 - If module numberwords is installed, code can use langs->getLabelFromNumber
   to get value of an amount in text.
-- A module can add subsitution keys in makesubsitutions() functions.
+- A module can add substitution keys in makesubsitutions() functions.
 - Add $conf->browser->phone defined to optimise code for smartphone browsers.
 - All external libs are now in same directory /includes.
 - All install files are now in same directory /install.
