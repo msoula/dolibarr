@@ -153,7 +153,19 @@ function societe_prepare_head(Societe $object)
 		} else {
 			$sql = "SELECT COUNT(n.rowid) as nb";
 			$sql .= " FROM ".MAIN_DB_PREFIX."projet as n";
+
+			// NOTE(msoula) add From from hooks
+			$parameters = array('function'=>'show_projects', 'projet_alias' => 'n');
+			$reshook = $hookmanager->executeHooks('selectThirdpartyProjectListFrom', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+			$sql .= $hookmanager->resPrint;
+
 			$sql .= " WHERE fk_soc = ".((int) $object->id);
+
+			// NOTE(msoula) add where from hooks
+			$parameters = array('function'=>'show_projects', 'projet_alias' => 'n');
+			$reshook = $hookmanager->executeHooks('selectThirdpartyProjectListWhere', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+			$sql .= $hookmanager->resPrint;
+
 			$sql .= " AND entity IN (".getEntity('project').")";
 			$resql = $db->query($sql);
 			if ($resql) {
@@ -892,8 +904,20 @@ function show_projects($conf, $langs, $db, $object, $backtopage = '', $nocreatel
 		$sql  = "SELECT p.rowid as id, p.entity, p.title, p.ref, p.public, p.dateo as do, p.datee as de, p.fk_statut as status, p.fk_opp_status, p.opp_amount, p.opp_percent, p.tms as date_modification, p.budget_amount";
 		$sql .= ", cls.code as opp_status_code";
 		$sql .= " FROM ".MAIN_DB_PREFIX."projet as p";
+
+		// NOTE(msoula): add From from hooks
+		$parameters = array('function'=>'show_projects');
+		$reshook = $hookmanager->executeHooks('selectThirdpartyProjectListFrom', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+		$sql .= $hookmanager->resPrint;
+
 		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."c_lead_status as cls on p.fk_opp_status = cls.rowid";
 		$sql .= " WHERE p.fk_soc = ".((int) $object->id);
+
+		// NOTE(msoula): add where from hooks
+		$parameters = array('function'=>'show_projects');
+		$reshook = $hookmanager->executeHooks('selectThirdpartyProjectListWhere', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+		$sql .= $hookmanager->resPrint;
+
 		$sql .= " AND p.entity IN (".getEntity('project').")";
 		$sql .= " ORDER BY p.dateo DESC";
 

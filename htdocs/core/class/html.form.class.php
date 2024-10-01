@@ -1553,6 +1553,10 @@ class Form
 		if (!$user->hasRight('societe', 'client', 'voir')) {
 			$sql .= ", " . $this->db->prefix() . "societe_commerciaux as sc";
 		}
+		// NOTE(msoula): add From from hooks
+		$parameters = array();
+		$reshook = $hookmanager->executeHooks('selectThirdpartyListFrom', $parameters); // Note that $action and $object may have been modified by hook
+		$sql .= $hookmanager->resPrint;
 		$sql .= " WHERE s.entity IN (" . getEntity('societe') . ")";
 		if (!empty($user->socid)) {
 			$sql .= " AND s.rowid = " . ((int) $user->socid);

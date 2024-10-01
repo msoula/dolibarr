@@ -178,150 +178,156 @@ if ($massaction == 'preaffectuser') {
 }
 
 if ($massaction == 'presend') {
-	$langs->load("mails");
 
-	$listofselectedid = array();
-	$listofselectedrecipientobjid = array();
-	$listofselectedref = array();
+	// NOTE(msoula): call hook presendPreMassActions
+	$reshook = $hookmanager->executeHooks('presendPreMassActions', $parameters, $object, $action);
+	if (empty($reshook)) {
 
-	if (!GETPOST('cancel', 'alpha')) {
-		foreach ($arrayofselected as $toselectid) {
-			$result = $objecttmp->fetch($toselectid);
-			if ($result > 0) {
-				$listofselectedid[$toselectid] = $toselectid;
-				$thirdpartyid = ($objecttmp->fk_soc ? $objecttmp->fk_soc : $objecttmp->socid);	// For proposal, order, invoice, conferenceorbooth, ...
-				if (in_array($objecttmp->element, array('societe', 'conferenceorboothattendee'))) {
-					$thirdpartyid = $objecttmp->id;
-				} elseif ($objecttmp->element == 'contact') {
-					$thirdpartyid = $objecttmp->id;
-				} elseif ($objecttmp->element == 'expensereport') {
-					$thirdpartyid = $objecttmp->fk_user_author;
+		$langs->load("mails");
+
+		$listofselectedid = array();
+		$listofselectedrecipientobjid = array();
+		$listofselectedref = array();
+
+		if (!GETPOST('cancel', 'alpha')) {
+			foreach ($arrayofselected as $toselectid) {
+				$result = $objecttmp->fetch($toselectid);
+				if ($result > 0) {
+					$listofselectedid[$toselectid] = $toselectid;
+					$thirdpartyid = ($objecttmp->fk_soc ? $objecttmp->fk_soc : $objecttmp->socid);	// For proposal, order, invoice, conferenceorbooth, ...
+					if (in_array($objecttmp->element, array('societe', 'conferenceorboothattendee'))) {
+						$thirdpartyid = $objecttmp->id;
+					} elseif ($objecttmp->element == 'contact') {
+						$thirdpartyid = $objecttmp->id;
+					} elseif ($objecttmp->element == 'expensereport') {
+						$thirdpartyid = $objecttmp->fk_user_author;
+					}
+					if (empty($thirdpartyid)) {
+						$thirdpartyid = 0;
+					}
+					if ($thirdpartyid) {
+						$listofselectedrecipientobjid[$thirdpartyid] = $thirdpartyid;
+					}
+					$listofselectedref[$thirdpartyid][$toselectid] = $objecttmp->ref;
 				}
-				if (empty($thirdpartyid)) {
-					$thirdpartyid = 0;
-				}
-				if ($thirdpartyid) {
-					$listofselectedrecipientobjid[$thirdpartyid] = $thirdpartyid;
-				}
-				$listofselectedref[$thirdpartyid][$toselectid] = $objecttmp->ref;
 			}
 		}
-	}
 
-	print '<input type="hidden" name="massaction" value="confirm_presend">';
+		print '<input type="hidden" name="massaction" value="confirm_presend">';
 
-	print dol_get_fiche_head(null, '', '');
+		print dol_get_fiche_head(null, '', '');
 
-	// Create mail form
-	include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
-	$formmail = new FormMail($db);
-	$formmail->withform = -1;
-	$formmail->fromtype = (GETPOST('fromtype') ? GETPOST('fromtype') : (getDolGlobalString('MAIN_MAIL_DEFAULT_FROMTYPE') ? $conf->global->MAIN_MAIL_DEFAULT_FROMTYPE : 'user'));
+		// Create mail form
+		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
+		$formmail = new FormMail($db);
+		$formmail->withform = -1;
+		$formmail->fromtype = (GETPOST('fromtype') ? GETPOST('fromtype') : (getDolGlobalString('MAIN_MAIL_DEFAULT_FROMTYPE') ? $conf->global->MAIN_MAIL_DEFAULT_FROMTYPE : 'user'));
 
-	if ($formmail->fromtype === 'user') {
-		$formmail->fromid = $user->id;
-	}
-	$formmail->trackid = $trackid;
-	$formmail->withfrom = 1;
-	$liste = $langs->trans("AllRecipientSelected", count($arrayofselected));
-	if (count($listofselectedrecipientobjid) == 1) { // Only 1 different recipient selected, we can suggest contacts
-		$liste = array();
-		$thirdpartyid = array_shift($listofselectedrecipientobjid);
-		if ($objecttmp->element == 'expensereport') {
-			$fuser = new User($db);
-			$fuser->fetch($thirdpartyid);
-			$liste['thirdparty'] = $fuser->getFullName($langs)." &lt;".$fuser->email."&gt;";
-		} elseif ($objecttmp->element == 'contact') {
-			$fcontact = new Contact($db);
-			$fcontact->fetch($thirdpartyid);
-			$liste['contact'] = $fcontact->getFullName($langs)." &lt;".$fcontact->email."&gt;";
-		} elseif ($objecttmp->element == 'partnership' && getDolGlobalString('PARTNERSHIP_IS_MANAGED_FOR') == 'member') {
-			$fadherent = new Adherent($db);
-			$fadherent->fetch($objecttmp->fk_member);
-			$liste['member'] = $fadherent->getFullName($langs)." &lt;".$fadherent->email."&gt;";
+		if ($formmail->fromtype === 'user') {
+			$formmail->fromid = $user->id;
+		}
+		$formmail->trackid = $trackid;
+		$formmail->withfrom = 1;
+		$liste = $langs->trans("AllRecipientSelected", count($arrayofselected));
+		if (count($listofselectedrecipientobjid) == 1) { // Only 1 different recipient selected, we can suggest contacts
+			$liste = array();
+			$thirdpartyid = array_shift($listofselectedrecipientobjid);
+			if ($objecttmp->element == 'expensereport') {
+				$fuser = new User($db);
+				$fuser->fetch($thirdpartyid);
+				$liste['thirdparty'] = $fuser->getFullName($langs)." &lt;".$fuser->email."&gt;";
+			} elseif ($objecttmp->element == 'contact') {
+				$fcontact = new Contact($db);
+				$fcontact->fetch($thirdpartyid);
+				$liste['contact'] = $fcontact->getFullName($langs)." &lt;".$fcontact->email."&gt;";
+			} elseif ($objecttmp->element == 'partnership' && getDolGlobalString('PARTNERSHIP_IS_MANAGED_FOR') == 'member') {
+				$fadherent = new Adherent($db);
+				$fadherent->fetch($objecttmp->fk_member);
+				$liste['member'] = $fadherent->getFullName($langs)." &lt;".$fadherent->email."&gt;";
+			} else {
+				$soc = new Societe($db);
+				$soc->fetch($thirdpartyid);
+				foreach ($soc->thirdparty_and_contact_email_array(1) as $key => $value) {
+					$liste[$key] = $value;
+				}
+			}
+			$formmail->withtoreadonly = 0;
 		} else {
-			$soc = new Societe($db);
-			$soc->fetch($thirdpartyid);
-			foreach ($soc->thirdparty_and_contact_email_array(1) as $key => $value) {
-				$liste[$key] = $value;
+			$formmail->withtoreadonly = 1;
+		}
+
+
+		$formmail->withoptiononeemailperrecipient = ((count($listofselectedref) == 1 && count(reset($listofselectedref)) == 1) || empty($liste)) ? 0 : (GETPOSTINT('oneemailperrecipient') ? 1 : -1);
+		if (in_array($objecttmp->element, array('conferenceorboothattendee'))) {
+			$formmail->withoptiononeemailperrecipient = 0;
+		}
+
+		$formmail->withto = empty($liste) ? (GETPOST('sendto', 'alpha') ? GETPOST('sendto', 'alpha') : array()) : $liste;
+		$formmail->withtofree = empty($liste) ? 1 : 0;
+		$formmail->withtocc = 1;
+		$formmail->withtoccc = getDolGlobalString('MAIN_EMAIL_USECCC');
+		if (!empty($topicmail)) {
+			$formmail->withtopic = $langs->transnoentities($topicmail, '__REF__', '__REF_CLIENT__');
+		} else {
+			$formmail->withtopic = 1;
+		}
+		if ($objecttmp->element == 'contact') {
+			$formmail->withfile = 0;
+			$formmail->withmaindocfile = 0; // Add a checkbox "Attach also main document"
+		} else {
+			$formmail->withfile = 1;    // $formmail->withfile = 2 to allow to upload files is not yet supported in mass action
+			// Add a checkbox "Attach also main document"
+			if (isset($withmaindocfilemail)) {
+				$formmail->withmaindocfile = $withmaindocfilemail;
+			} else {    // Do an automatic definition of $formmail->withmaindocfile
+				$formmail->withmaindocfile = 1;
+				if ($objecttmp->element != 'societe') {
+					$formmail->withfile = '<span class="hideonsmartphone opacitymedium">' . $langs->trans("OnlyPDFattachmentSupported") . '</span>';
+					$formmail->withmaindocfile = -1; // Add a checkbox "Attach also main document" but not checked by default
+				}
 			}
 		}
-		$formmail->withtoreadonly = 0;
-	} else {
-		$formmail->withtoreadonly = 1;
-	}
 
+		$formmail->withbody = 1;
+		$formmail->withdeliveryreceipt = 1;
+		$formmail->withcancel = 1;
 
-	$formmail->withoptiononeemailperrecipient = ((count($listofselectedref) == 1 && count(reset($listofselectedref)) == 1) || empty($liste)) ? 0 : (GETPOSTINT('oneemailperrecipient') ? 1 : -1);
-	if (in_array($objecttmp->element, array('conferenceorboothattendee'))) {
-		$formmail->withoptiononeemailperrecipient = 0;
-	}
+		// Make substitution in email content
+		$substitutionarray = getCommonSubstitutionArray($langs, 0, null, $object);
 
-	$formmail->withto = empty($liste) ? (GETPOST('sendto', 'alpha') ? GETPOST('sendto', 'alpha') : array()) : $liste;
-	$formmail->withtofree = empty($liste) ? 1 : 0;
-	$formmail->withtocc = 1;
-	$formmail->withtoccc = getDolGlobalString('MAIN_EMAIL_USECCC');
-	if (!empty($topicmail)) {
-		$formmail->withtopic = $langs->transnoentities($topicmail, '__REF__', '__REF_CLIENT__');
-	} else {
-		$formmail->withtopic = 1;
-	}
-	if ($objecttmp->element == 'contact') {
-		$formmail->withfile = 0;
-		$formmail->withmaindocfile = 0; // Add a checkbox "Attach also main document"
-	} else {
-		$formmail->withfile = 1;    // $formmail->withfile = 2 to allow to upload files is not yet supported in mass action
-		// Add a checkbox "Attach also main document"
-		if (isset($withmaindocfilemail)) {
-			$formmail->withmaindocfile = $withmaindocfilemail;
-		} else {    // Do an automatic definition of $formmail->withmaindocfile
-			$formmail->withmaindocfile = 1;
-			if ($objecttmp->element != 'societe') {
-				$formmail->withfile = '<span class="hideonsmartphone opacitymedium">' . $langs->trans("OnlyPDFattachmentSupported") . '</span>';
-				$formmail->withmaindocfile = -1; // Add a checkbox "Attach also main document" but not checked by default
-			}
+		$substitutionarray['__EMAIL__'] = $sendto;
+		$substitutionarray['__CHECK_READ__'] = '<img src="'.DOL_MAIN_URL_ROOT.'/public/emailing/mailing-read.php?tag=undefined&securitykey='.dol_hash(getDolGlobalString('MAILING_EMAIL_UNSUBSCRIBE_KEY')."-undefined", 'md5').'" width="1" height="1" style="width:1px;height:1px" border="0"/>';
+		$substitutionarray['__ONLINE_PAYMENT_URL__'] = 'UrlToPayOnlineIfApplicable';
+		$substitutionarray['__ONLINE_PAYMENT_TEXT_AND_URL__'] = 'TextAndUrlToPayOnlineIfApplicable';
+		$substitutionarray['__THIRDPARTY_NAME__'] = '__THIRDPARTY_NAME__';
+		$substitutionarray['__PROJECT_NAME__'] = '__PROJECT_NAME__';
+
+		$parameters = array(
+			'mode' => 'formemail'
+		);
+		complete_substitutions_array($substitutionarray, $langs, $object, $parameters);
+
+		// Array of substitutions
+		$formmail->substit = $substitutionarray;
+
+		// Tableau des parameters complementaires du post
+		$formmail->param['action'] = $action;
+		$formmail->param['models'] = $modelmail;	// the filter to know which kind of template emails to show. 'none' means no template suggested.
+		$formmail->param['models_id'] = GETPOSTINT('modelmailselected') ? GETPOSTINT('modelmailselected') : '-1';
+		$formmail->param['id'] = implode(',', $arrayofselected);
+		// $formmail->param['returnurl']=$_SERVER["PHP_SELF"].'?id='.$object->id;
+		if (getDolGlobalString('MAILING_LIMIT_SENDBYWEB') && count($listofselectedrecipientobjid) > $conf->global->MAILING_LIMIT_SENDBYWEB) {
+			// Note: MAILING_LIMIT_SENDBYWEB may be forced by conf.php file and variable $dolibarr_mailing_limit_sendbyweb
+			$langs->load("errors");
+			print img_warning().' '.$langs->trans('WarningNumberOfRecipientIsRestrictedInMassAction', getDolGlobalString('MAILING_LIMIT_SENDBYWEB'));
+			print ' - <a href="javascript: window.history.go(-1)">'.$langs->trans("GoBack").'</a>';
+			$arrayofmassactions = array();
+		} else {
+			print $formmail->get_form();
 		}
+
+		print dol_get_fiche_end();
 	}
-
-	$formmail->withbody = 1;
-	$formmail->withdeliveryreceipt = 1;
-	$formmail->withcancel = 1;
-
-	// Make substitution in email content
-	$substitutionarray = getCommonSubstitutionArray($langs, 0, null, $object);
-
-	$substitutionarray['__EMAIL__'] = $sendto;
-	$substitutionarray['__CHECK_READ__'] = '<img src="'.DOL_MAIN_URL_ROOT.'/public/emailing/mailing-read.php?tag=undefined&securitykey='.dol_hash(getDolGlobalString('MAILING_EMAIL_UNSUBSCRIBE_KEY')."-undefined", 'md5').'" width="1" height="1" style="width:1px;height:1px" border="0"/>';
-	$substitutionarray['__ONLINE_PAYMENT_URL__'] = 'UrlToPayOnlineIfApplicable';
-	$substitutionarray['__ONLINE_PAYMENT_TEXT_AND_URL__'] = 'TextAndUrlToPayOnlineIfApplicable';
-	$substitutionarray['__THIRDPARTY_NAME__'] = '__THIRDPARTY_NAME__';
-	$substitutionarray['__PROJECT_NAME__'] = '__PROJECT_NAME__';
-
-	$parameters = array(
-		'mode' => 'formemail'
-	);
-	complete_substitutions_array($substitutionarray, $langs, $object, $parameters);
-
-	// Array of substitutions
-	$formmail->substit = $substitutionarray;
-
-	// Tableau des parameters complementaires du post
-	$formmail->param['action'] = $action;
-	$formmail->param['models'] = $modelmail;	// the filter to know which kind of template emails to show. 'none' means no template suggested.
-	$formmail->param['models_id'] = GETPOSTINT('modelmailselected') ? GETPOSTINT('modelmailselected') : '-1';
-	$formmail->param['id'] = implode(',', $arrayofselected);
-	// $formmail->param['returnurl']=$_SERVER["PHP_SELF"].'?id='.$object->id;
-	if (getDolGlobalString('MAILING_LIMIT_SENDBYWEB') && count($listofselectedrecipientobjid) > $conf->global->MAILING_LIMIT_SENDBYWEB) {
-		// Note: MAILING_LIMIT_SENDBYWEB may be forced by conf.php file and variable $dolibarr_mailing_limit_sendbyweb
-		$langs->load("errors");
-		print img_warning().' '.$langs->trans('WarningNumberOfRecipientIsRestrictedInMassAction', getDolGlobalString('MAILING_LIMIT_SENDBYWEB'));
-		print ' - <a href="javascript: window.history.go(-1)">'.$langs->trans("GoBack").'</a>';
-		$arrayofmassactions = array();
-	} else {
-		print $formmail->get_form();
-	}
-
-	print dol_get_fiche_end();
 }
 
 if ($massaction == 'edit_extrafields') {
