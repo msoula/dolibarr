@@ -119,6 +119,7 @@ class Documents extends DolibarrApi
 	 * @param   string  $original_file  Relative path with filename, relative to modulepart (for example: IN201701-999/IN201701-999.pdf).
 	 * @param	string	$doctemplate	Set here the doc template to use for document generation (If not set, use the default template).
 	 * @param	string	$langcode		Language code like 'en_US', 'fr_FR', 'es_ES', ... (If not set, use the default language).
+	 * @param	array		$userdata		User data.
 	 * @return  array                   List of documents
 	 *
 	 * @url PUT /builddoc
@@ -129,7 +130,7 @@ class Documents extends DolibarrApi
 	 * @throws	RestException	500		Error generating document
 	 * @throws	RestException	501		File not found
 	 */
-	public function builddoc($modulepart, $original_file = '', $doctemplate = '', $langcode = '')
+	public function builddoc($modulepart, $original_file = '', $doctemplate = '', $langcode = '', $userdata = '')
 	{
 		global $conf, $langs;
 
@@ -144,6 +145,14 @@ class Documents extends DolibarrApi
 		if ($langcode && $langs->defaultlang != $langcode) {
 			$outputlangs = new Translate('', $conf);
 			$outputlangs->setDefaultLang($langcode);
+		}
+
+		// load user data
+		$moreparams = array();
+		if (isset($userdata)) {
+			foreach ($userdata as $field => $value) {
+				$moreparams[$field] = $value;
+			}
 		}
 
 		//--- Finds and returns the document
@@ -256,7 +265,7 @@ class Documents extends DolibarrApi
 			}
 
 			$templateused = $doctemplate ? $doctemplate : $tmpobject->model_pdf;
-			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref);
+			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
 			if ($result <= 0) {
 				throw new RestException(500, 'Error generating document missing doctemplate parameter');
@@ -276,6 +285,22 @@ class Documents extends DolibarrApi
 
 			if ($result <= 0) {
 				throw new RestException(500, 'Error generating document missing doctemplate parameter');
+			}
+		} elseif ($modulepart == 'fichinter') {
+			require_once DOL_DOCUMENT_ROOT . '/fichinter/class/fichinter.class.php';
+
+			$tmpobject = new FichInter($this->db);
+			$result = $tmpobject->fetch(0, preg_replace('/\.[^\.]+$/', '', basename($original_file)));
+
+			if (!$result) {
+				throw new RestException(404, 'Intervention not found');
+			}
+
+			$templateused = $doctemplate ? $doctemplate : $tmpobject->model_pdf;
+			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+
+			if (!$result) {
+				throw new RestException(500, 'Error generating document');
 			}
 		} else {
 			throw new RestException(403, 'Generation not available for this modulepart');
