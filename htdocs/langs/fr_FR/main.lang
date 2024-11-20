@@ -1307,3 +1307,4 @@ TranslationOfKey=Traduction de la clé AnyTranslationKey
 SignedStatus=Statut signature
 NbRecordQualified=Nombre d'enregistrements qualifiés
 auto=auto
+HideRevealPassword=Cacher/Afficher le mot de passe

@@ -1308,3 +1308,4 @@ TranslationOfKey=Translation of the key AnyTranslationKey
 SignedStatus=Signed status
 NbRecordQualified=Number of qualified records
 auto=auto
+HideRevealPassword=Hide/Reveal password

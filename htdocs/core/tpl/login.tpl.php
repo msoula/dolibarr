@@ -220,7 +220,30 @@ if ($disablenofollow) {
 	} ?>
 <!--<span class="span-icon-password">-->
 <span class="fa fa-key"></span>
+<?php
+// retrieve test password
+global $passwordtotest;
+if (isset($passwordtotest)) {
+	$password = $passwordtotest;
+}
+?>
 <input type="password" id="password" maxlength="128" placeholder="<?php echo $langs->trans("Password"); ?>" name="password" class="flat input-icon-password minwidth150" value="<?php echo dol_escape_htmltag($password); ?>" tabindex="2" autocomplete="<?php echo !getDolGlobalString('MAIN_LOGIN_ENABLE_PASSWORD_AUTOCOMPLETE') ? 'off' : 'on'; ?>" />
+<i id="password-reveal" class="fa fa-eye cursorpointer" title="<?php echo $langs->trans("HideRevealPassword"); ?>" onclick="showHidePassword()"></i>
+<script type="text/javascript">
+function showHidePassword() {
+	const input = document.getElementById("password");
+	const icon = document.getElementById("password-reveal");
+	if (input.type === "password") {
+		input.type = "text";
+		icon.classList.remove('fa-eye');
+		icon.classList.add('fa-eye-slash');
+	} else {
+		input.type = "password";
+		icon.classList.remove('fa-eye-slash');
+		icon.classList.add('fa-eye');
+	}
+}
+</script>
 </div></div>
 <?php } ?>
 
