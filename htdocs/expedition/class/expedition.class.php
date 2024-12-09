@@ -297,6 +297,7 @@ class Expedition extends CommonObject
 		$this->labelStatus[0]  = 'StatusSendingDraft';
 		$this->labelStatus[1]  = 'StatusSendingValidated';
 		$this->labelStatus[2]  = 'StatusSendingProcessed';
+		$this->labelStatus[3]  = 'StatusSendingShipmentInProgress';
 
 		// List of short language codes for status
 		$this->labelStatusShort = array();
@@ -304,6 +305,7 @@ class Expedition extends CommonObject
 		$this->labelStatusShort[0]  = 'StatusSendingDraftShort';
 		$this->labelStatusShort[1]  = 'StatusSendingValidatedShort';
 		$this->labelStatusShort[2]  = 'StatusSendingProcessedShort';
+		$this->labelStatusShort[3]  = 'StatusSendingShipmentInProgressShort';
 	}
 
 	/**
