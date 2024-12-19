@@ -1100,19 +1100,19 @@ class Notify
 						break;
 					case 'FICHINTER_ADD_CONTACT':
 						$link = '<a href="'.$urlwithroot.'/fichinter/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->ficheinter->dir_output;
+						$dir_output = $conf->ficheinter->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'fichinter');
 						$object_type = 'ficheinter';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextInterventionAddedContact", $link);
 						break;
 					case 'FICHINTER_VALIDATE':
 						$link = '<a href="'.$urlwithroot.'/fichinter/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->facture->dir_output;
+						$dir_output = $conf->facture->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'fichinter');
 						$object_type = 'ficheinter';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextInterventionValidated", $link);
 						break;
 					case 'FICHINTER_CLOSE':
 						$link = '<a href="'.$urlwithroot.'/fichinter/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->facture->dir_output;
+						$dir_output = $conf->facture->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'fichinter');
 						$object_type = 'ficheinter';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextInterventionClosed", $link);
 						break;
@@ -1164,31 +1164,31 @@ class Notify
 						break;
 					case 'EXPENSE_REPORT_VALIDATE':
 						$link = '<a href="'.$urlwithroot.'/expensereport/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->expensereport->dir_output;
+						$dir_output = $conf->expensereport->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'expensereport');
 						$object_type = 'expensereport';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextExpenseReportValidated", $link);
 						break;
 					case 'EXPENSE_REPORT_APPROVE':
 						$link = '<a href="'.$urlwithroot.'/expensereport/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->expensereport->dir_output;
+						$dir_output = $conf->expensereport->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'expensereport');
 						$object_type = 'expensereport';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextExpenseReportApproved", $link);
 						break;
 					case 'HOLIDAY_VALIDATE':
 						$link = '<a href="'.$urlwithroot.'/holiday/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->holiday->dir_output;
+						$dir_output = $conf->holiday->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'holiday');
 						$object_type = 'holiday';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextHolidayValidated", $link);
 						break;
 					case 'HOLIDAY_APPROVE':
 						$link = '<a href="'.$urlwithroot.'/holiday/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->holiday->dir_output;
+						$dir_output = $conf->holiday->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'holiday');
 						$object_type = 'holiday';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextHolidayApproved", $link);
 						break;
 					case 'ACTION_CREATE':
 						$link = '<a href="'.$urlwithroot.'/comm/action/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->agenda->dir_output;
+						$dir_output = $conf->agenda->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'agenda');
 						$object_type = 'action';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextActionAdded", $link);
 						break;
@@ -1199,7 +1199,7 @@ class Notify
 						break;
 				}
 				$ref = dol_sanitizeFileName($newref);
-				$pdf_path = $dir_output."/".$ref."/".$ref.".pdf";
+				$pdf_path = $dir_output."/".$ref.".pdf";
 				if (!dol_is_file($pdf_path)) {
 					// We can't add PDF as it is not generated yet.
 					$filepdf = '';
