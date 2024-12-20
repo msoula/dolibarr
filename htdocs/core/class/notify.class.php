@@ -744,6 +744,7 @@ class Notify
 								$mesg = $outputlangs->transnoentitiesnoconv("EMailTextInvoiceCanceled", $link);
 								break;
 							case 'BILL_VALIDATE':
+							case 'IZ_ORDER_COMPLETE_INVOICE':
 								$link = '<a href="'.$urlwithroot.'/compta/facture/card.php?facid='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
 								$dir_output = $conf->facture->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'invoice');
 								$object_type = 'facture';
@@ -861,6 +862,7 @@ class Notify
 								$mesg .= "\n\n".$outputlangs->transnoentitiesnoconv("Sincerely").".\n\n";
 								break;
 							case 'SHIPPING_VALIDATE':
+							case 'IZ_ORDER_COMPLETE_SHIPPING':
 								$link = '<a href="'.$urlwithroot.'/expedition/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
 								$dir_output = $conf->expedition->dir_output."/sending/".get_exdir(0, 0, 0, 1, $object, 'shipment');
 								$object_type = 'shipping';
@@ -1063,6 +1065,7 @@ class Notify
 
 				switch ($notifcode) {
 					case 'BILL_VALIDATE':
+					case 'IZ_ORDER_COMPLETE_INVOICE':
 						$link = '<a href="'.$urlwithroot.'/compta/facture/card.php?facid='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
 						$dir_output = $conf->facture->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'invoice');
 						$object_type = 'facture';
@@ -1157,6 +1160,7 @@ class Notify
 						$mesg .= "\n\n".$langs->transnoentitiesnoconv("Sincerely").".\n\n";
 						break;
 					case 'SHIPPING_VALIDATE':
+					case 'IZ_ORDER_COMPLETE_SHIPPING':
 						$link = '<a href="'.$urlwithroot.'/expedition/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
 						$dir_output = $conf->expedition->dir_output."/sending/".get_exdir(0, 0, 0, 1, $object, 'shipment');
 						$object_type = 'order_supplier';
