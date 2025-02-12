@@ -975,7 +975,23 @@ class Dolresource extends CommonObject
 
 		$result .= $linkstart;
 		if ($withpicto) {
-			$result .= img_object(($notooltip ? '' : $label), ($this->picto ?: 'generic'), (($withpicto != 2) ? 'class="paddingright"' : ''), 0, 0, $notooltip ? 0 : 1);
+			$paddafterimage = '';
+			if (abs((int) $withpicto) == 1) {
+				$paddafterimage = 'style="margin-'.($langs->trans("DIRECTION") == 'rtl' ? 'left' : 'right').': 3px;"';
+			}
+			// Only picto
+			if ($withpicto > 0) {
+				$picto = img_object(
+					($notooltip ? '' : $label),
+					($this->picto ?: 'generic'),
+					(($withpicto != 2) ? 'class="paddingright"' : ''),
+					0, 0, $notooltip ? 0 : 1
+				);
+			} else {
+				// Picto must be a photo
+				$picto = '<!-- picto photo resource --><span class="nopadding userimg'.($morecss ? ' '.$morecss : '').'"'.($paddafterimage ? ' '.$paddafterimage : '').'>'.Form::showphoto('resource', $this, 0, 0, 0, 'userphoto'.($withpicto == -3 ? 'small' : ''), 'mini', 0, 1).'</span>';
+			}
+			$result .= $picto;
 		}
 		if ($withpicto != 2) {
 			$result .= $this->ref;
@@ -1042,5 +1058,42 @@ class Dolresource extends CommonObject
 			$this->error = $this->db->error();
 			return -1;
 		}
+	}
+
+	/**
+	 * Function used to get the logos or photos of an object
+	 *
+	 * @param 	string	$modulepart		Module part
+	 * @param 	string	$imagesize		Image size ('', 'mini' or 'small')
+	 * @return	array{dir:string,file:string,originalfile:string,altfile:string,email:string,capture:string}	Array of data to show photo
+	 */
+	public function getDataToShowPhoto($modulepart, $imagesize)
+	{
+		global $conf;
+
+		$dir = $conf->resource->dir_output;
+		$photo = 'thumbnail.png';
+
+		$exdir = get_exdir(0, 0, 0, 0, $this, 'resource');
+
+		$originalfile = $exdir.$photo;
+		if ((string) $imagesize == 'mini') {
+			$file = $exdir.getImageFileNameForSize($photo, '_mini');
+		} elseif ((string) $imagesize == 'small') {
+			$file = $exdir.getImageFileNameForSize($photo, '_small');
+		} else {
+			$file = $originalfile;
+		}
+
+		$result = [
+			'dir'   => $dir,
+			'file'  => $file,
+			'originalfile' => $originalfile,
+			'altfile' => $originalfile,
+			'email' => $this->email,
+			'capture' => 'user'
+		];
+
+		return $result;
 	}
 }

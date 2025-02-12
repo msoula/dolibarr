@@ -10224,9 +10224,11 @@ class Form
 			} else {
 				$nophoto = '/public/theme/common/nophoto.png';
 				$defaultimg = 'identicon';        // For gravatar
-				if (in_array($modulepart, array('societe', 'userphoto', 'contact', 'memberphoto'))) {    // For modules that need a special image when photo not found
+				if (in_array($modulepart, array('societe', 'userphoto', 'contact', 'memberphoto', 'resource'))) {    // For modules that need a special image when photo not found
 					if ($modulepart == 'societe' || ($modulepart == 'memberphoto' && !empty($object->morphy) && strpos($object->morphy, 'mor') !== false)) {
 						$nophoto = 'company';
+					} elseif ($modulepart == 'resource') {
+						$nophoto = 'resource';
 					} else {
 						$nophoto = '/public/theme/common/user_anonymous.png';
 						if (!empty($object->gender) && $object->gender == 'man') {
@@ -10245,6 +10247,9 @@ class Form
 				} else {
 					if ($nophoto == 'company') {
 						$ret .= '<div class="divforspanimg valignmiddle center photo' . $modulepart . ($cssclass ? ' ' . $cssclass : '') . '" alt="" ' . ($width ? ' width="' . $width . '"' : '') . ($height ? ' height="' . $height . '"' : '') . '>' . img_picto('', 'company') . '</div>';
+						//$ret .= '<div class="difforspanimgright"></div>';
+					} elseif ($nophoto == 'resource') {
+						$ret .= '<div class="divforspanimg valignmiddle center nobackground photo' . $modulepart . ($cssclass ? ' ' . $cssclass : '') . '" alt="" ' . ($width ? ' width="' . $width . '"' : '') . ($height ? ' height="' . $height . '"' : '') . '>' . img_picto('', 'resource') . '</div>';
 						//$ret .= '<div class="difforspanimgright"></div>';
 					} else {
 						$ret .= '<img class="photo' . $modulepart . ($cssclass ? ' ' . $cssclass : '') . '" alt="" ' . ($width ? ' width="' . $width . '"' : '') . ($height ? ' height="' . $height . '"' : '') . ' src="' . DOL_URL_ROOT . $nophoto . '">';

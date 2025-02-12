@@ -2731,6 +2731,8 @@ function dol_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $fieldi
 		$modulepart = 'memberphoto';
 	} elseif ($object->element == 'user') {
 		$modulepart = 'userphoto';
+	} elseif ($object->element == 'dolresource') {
+		$modulepart = 'resource';
 	}
 
 	if (class_exists("Imagick")) {

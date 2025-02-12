@@ -591,7 +591,7 @@ while ($i < $imaxinloop) {
 	print '<tr class="oddeven">';
 
 	if (!empty($arrayfields['t.ref']['checked'])) {
-		print '<td>'.$objectstatic->getNomUrl(5).'</td>';
+		print '<td>'.$objectstatic->getNomUrl(-1).'</td>';
 		if (!$i) {
 			$totalarray['nbfield']++;
 		}
