@@ -3902,7 +3902,7 @@ if ($action == 'create') {
 				} else {
 					$tmp = '<input type="radio" name="type" id="radio_creditnote" value="2" > ';
 				}
-				$text = $tmp.'<label class="opacitymedium" for="radio_creditnote">'.$langs->trans("InvoiceAvoir").'</label> ';
+				$text = $tmp.'<label'.(!getDolGlobalString('INVOICE_CREDIT_NOTE_STANDALONE')?' class="opacitymedium"':'').' for="radio_creditnote">'.$langs->trans("InvoiceAvoir").'</label> ';
 				//$text .= '<span class="opacitymedium hideonsmartphone">('.$langs->trans("YouMustCreateInvoiceFromThird").')</span> ';
 				$desc = $form->textwithpicto($text, $langs->transnoentities("InvoiceAvoirDesc").'<br><br>'.$langs->trans("CreateCreditNoteWhenClientInvoiceExists"), 1, 'help', '', 0, 3, 'creditnoteonsmartphone');
 				print $desc;
