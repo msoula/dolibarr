@@ -387,7 +387,8 @@ class BookKeeping extends CommonObject
 					dol_syslog(get_class($this).":: create now this->piece_num=".$this->piece_num, LOG_DEBUG);
 				}
 				if (empty($this->piece_num)) {
-					$this->piece_num = 1;
+					// NOTE(msoula): starting number for new records in bookkeeping
+					$this->piece_num = 20030;
 				}
 
 				$now = dol_now();
