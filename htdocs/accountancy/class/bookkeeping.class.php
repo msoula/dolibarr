@@ -388,7 +388,7 @@ class BookKeeping extends CommonObject
 				}
 				if (empty($this->piece_num)) {
 					// NOTE(msoula): starting number for new records in bookkeeping
-					$this->piece_num = 20030;
+					$this->piece_num = getDolGlobalInt('IRVI_BOOKKEEPING_STARTING_NUMBER', 1);
 				}
 
 				$now = dol_now();
