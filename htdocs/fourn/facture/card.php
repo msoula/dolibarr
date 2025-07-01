@@ -3589,7 +3589,7 @@ if ($action == 'create') {
 				$calculationrulenum = 2;
 			}
 			// Show link for "recalculate"
-			if ($object->getVentilExportCompta() == 0) {
+			if ($object->getVentilExportCompta() == 0 && !$object->isFromSAGE()) {
 				$s = '<span class="hideonsmartphone opacitymedium">' . $langs->trans("ReCalculate") . ' </span>';
 				$s .= '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=calculate&token='.newToken().'&calculationrule=totalofround">' . $langs->trans("Mode1") . '</a>';
 				$s .= ' / ';

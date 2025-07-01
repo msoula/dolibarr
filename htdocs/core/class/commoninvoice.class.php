@@ -2027,6 +2027,15 @@ abstract class CommonInvoice extends CommonObject
 		//var_dump($s);exit;
 		return $s;
 	}
+
+	/**
+	 *	NOTE(msoula): whether this invoice is from SAGE import or not
+	 *	@return boolean
+	 */
+	public function isFromSAGE()
+	{
+		return !empty($this->import_key);
+	}
 }
 
 

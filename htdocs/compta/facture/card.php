@@ -5828,7 +5828,7 @@ if ($action == 'create') {
 				// We check if lines of invoice are not already transferred into accountancy
 				$ventilExportCompta = $object->getVentilExportCompta();
 
-				if ($ventilExportCompta == 0) {
+				if (false && $ventilExportCompta == 0) {
 					if (getDolGlobalString('INVOICE_CAN_BE_EDITED_EVEN_IF_PAYMENT_DONE') || ($resteapayer == price2num($object->total_ttc, 'MT', 1) && empty($object->paye))) {
 						if (!$objectidnext && $object->is_last_in_cycle()) {
 							if ($usercanunvalidate) {

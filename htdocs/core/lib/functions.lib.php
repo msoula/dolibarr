@@ -3290,8 +3290,9 @@ function dol_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $fieldi
 		// Note: For 'chargesociales', 'salaries'... this is the payments that are dispatched (so element = 'bank')
 		if (method_exists($object, 'getVentilExportCompta')) {
 			$accounted = $object->getVentilExportCompta();
+			$fromsage = $object->isFromSAGE();
 			$langs->load("accountancy");
-			$morehtmlstatus .= '</div><div class="statusref statusrefbis"><span class="opacitymedium">'.($accounted > 0 ? $langs->trans("Accounted") : $langs->trans("NotYetAccounted")).'</span>';
+			$morehtmlstatus .= '</div><div class="statusref statusrefbis"><span class="opacitymedium">'.($fromsage ? $langs->trans("irv_FromSAGE") : ($accounted > 0 ? $langs->trans("Accounted") : $langs->trans("NotYetAccounted"))).'</span>';
 		}
 	}
 
