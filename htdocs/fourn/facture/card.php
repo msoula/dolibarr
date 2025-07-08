@@ -3273,8 +3273,28 @@ if ($action == 'create') {
 		// Ref supplier
 		$morehtmlref .= $form->editfieldkey("RefSupplierBill", 'ref_supplier', $object->ref_supplier, $object, $usercancreate, 'string', '', 0, 1);
 		$morehtmlref .= $form->editfieldval("RefSupplierBill", 'ref_supplier', $object->ref_supplier, $object, $usercancreate, 'string', '', null, null, '', 1);
+		// -----------------------------------------------------------------------
+		// U2042
+		// -----------------------------------------------------------------------
 		// Thirdparty
-		$morehtmlref .= '<br>'.$object->thirdparty->getNomUrl(1, 'supplier');
+		$displayview = $soc->getNomUrl(1, 'supplier');
+		$parameters = [
+			'form' => &$form,
+			'page' => $_SERVER['PHP_SELF'].'?id='.$object->id,
+			'selected' => $object->socid,
+			'displayview' => $displayview
+		];
+		// Note that $action and $object may be modified by some hooks
+		$reshook = $hookmanager->executeHooks('printThirdpartyInfoInBanner', $parameters, $object, $action);
+		if (!empty($reshook)) {
+			$morehtmlref .= '<br>'.$hookmanager->resPrint;
+		}
+		else {
+			$morehtmlref .= '<br>'.$displayview;
+		}
+		// -----------------------------------------------------------------------
+		// END
+		// -----------------------------------------------------------------------
 		if (!getDolGlobalString('MAIN_DISABLE_OTHER_LINK') && $object->thirdparty->id > 0) {
 			$morehtmlref .= ' <div class="inline-block valignmiddle">(<a class="valignmiddle" href="'.DOL_URL_ROOT.'/fourn/facture/list.php?socid='.((int) $object->thirdparty->id).'&search_company='.urlencode($object->thirdparty->name).'">'.$langs->trans("OtherBills").'</a>)</div>';
 		}

@@ -944,8 +944,30 @@ if ($action == 'create') {
 		print '</td></tr>';
 
 		// Third party
-		print '<tr><td class="titlefieldcreate">' . $langs->trans("Supplier") . '</td><td>' . $object->thirdparty->getNomUrl(1, 'supplier') . '</td>';
-		print '</tr>';
+		print '<tr><td class="titlefieldcreate">' . $langs->trans("Supplier") . '</td><td>';
+		// -----------------------------------------------------------------------
+		// U2042
+		// -----------------------------------------------------------------------
+		// Thirdparty
+		$displayview = $soc->getNomUrl(1, 'supplier');
+		$parameters = [
+			'form' => &$form,
+			'page' => $_SERVER['PHP_SELF'].'?id='.$object->id,
+			'selected' => $object->socid,
+			'displayview' => $displayview
+		];
+		// Note that $action and $object may be modified by some hooks
+		$reshook = $hookmanager->executeHooks('printThirdpartyInfoInBanner', $parameters, $object, $action);
+		if (!empty($reshook)) {
+			$morehtmlref .= '<br>'.$hookmanager->resPrint;
+		}
+		else {
+			$morehtmlref .= '<br>'.$displayview;
+		}
+		// -----------------------------------------------------------------------
+		// END
+		// -----------------------------------------------------------------------
+		print '</td></tr>';
 
 		// Invoice subtype
 		if (getDolGlobalInt('INVOICE_SUBTYPE_ENABLED')) {

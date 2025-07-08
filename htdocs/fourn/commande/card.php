@@ -2167,7 +2167,28 @@ if ($action == 'create') {
 		if (getDolGlobalString('MAIN_CAN_EDIT_SUPPLIER_ON_SUPPLIER_ORDER') && $object->statut == CommandeFournisseur::STATUS_DRAFT) {
 			$morehtmlref .= '<a class="editfielda" href="'.$_SERVER['PHP_SELF'].'?action=edit_thirdparty&token='.newToken().'&id='.$object->id.'">'.img_edit($langs->transnoentitiesnoconv('SetThirdParty')).'</a>';
 		}
-		$morehtmlref .= $object->thirdparty->getNomUrl(1, 'supplier');
+		// -----------------------------------------------------------------------
+		// U2042
+		// -----------------------------------------------------------------------
+		// Thirdparty
+		$displayview = $soc->getNomUrl(1, 'supplier');
+		$parameters = [
+			'form' => &$form,
+			'page' => $_SERVER['PHP_SELF'].'?id='.$object->id,
+			'selected' => $object->socid,
+			'displayview' => $displayview
+		];
+		// Note that $action and $object may be modified by some hooks
+		$reshook = $hookmanager->executeHooks('printThirdpartyInfoInBanner', $parameters, $object, $action);
+		if (!empty($reshook)) {
+			$morehtmlref .= '<br>'.$hookmanager->resPrint;
+		}
+		else {
+			$morehtmlref .= '<br>'.$displayview;
+		}
+		// -----------------------------------------------------------------------
+		// END
+		// -----------------------------------------------------------------------
 		if (!getDolGlobalString('MAIN_DISABLE_OTHER_LINK') && $object->thirdparty->id > 0) {
 			$morehtmlref .= ' (<a href="'.DOL_URL_ROOT.'/fourn/commande/list.php?socid='.$object->thirdparty->id.'&search_company='.urlencode($object->thirdparty->name).'">'.$langs->trans("OtherOrders").'</a>)';
 		}
