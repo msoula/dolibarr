@@ -3071,7 +3071,7 @@ if ($action == 'create') {
 		}
 
 		// Form to add new line
-		if ($object->status == Propal::STATUS_DRAFT && $usercancreate && $action != 'selectlines') {
+		if ($object->status == Propal::STATUS_DRAFT && $usercancreate && $action != 'selectlines' && 'irv_addbelow' != $action) {
 			if ($action != 'editline') {
 				$parameters = array();
 				$reshook = $hookmanager->executeHooks('formAddObjectLine', $parameters, $object, $action); // Note that $action and $object may have been modified by hook

@@ -1918,7 +1918,7 @@ if ($action == 'create') {
 
 		// Form to add new line
 		if ($object->statut == SupplierProposal::STATUS_DRAFT && $usercancreate) {
-			if ($action != 'editline') {
+			if ($action != 'editline' && 'irv_addbelow' != $action) {
 				// Add products/services form
 
 				$parameters = array('dateSelector' => $dateSelector);

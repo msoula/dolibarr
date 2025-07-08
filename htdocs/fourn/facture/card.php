@@ -4005,7 +4005,7 @@ if ($action == 'create') {
 
 			// Form to add new line
 			if ($object->status == FactureFournisseur::STATUS_DRAFT && $usercancreate) {
-				if ($action != 'editline') {
+				if ($action != 'editline' && 'irv_addbelow' != $action) {
 					// Add free products/services
 
 					$parameters = array();

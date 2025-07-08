@@ -2509,7 +2509,7 @@ if ($action == 'create') {
 
 		// Form to add new line
 		if ($object->statut == CommandeFournisseur::STATUS_DRAFT && $usercancreate) {
-			if ($action != 'editline') {
+			if ($action != 'editline' && 'irv_addbelow' != $action) {
 				// Add free products/services
 
 				$parameters = array();

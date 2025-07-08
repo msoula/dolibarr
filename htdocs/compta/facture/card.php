@@ -5784,7 +5784,7 @@ if ($action == 'create') {
 
 		// Form to add new line
 		if ($object->status == 0 && $usercancreate && $action != 'valid') {
-			if ($action != 'editline' && $action != 'selectlines') {
+			if ($action != 'editline' && $action != 'selectlines' && 'irv_addbelow' != $action) {
 				// Add free products/services
 
 				$parameters = array();

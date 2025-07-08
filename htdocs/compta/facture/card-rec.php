@@ -1721,7 +1721,7 @@ if ($action == 'create') {
 		}
 
 		// Form to add new line
-		if ($object->status == $object::STATUS_DRAFT && $user->hasRight('facture', 'creer') && $action != 'valid' && $action != 'editline') {
+		if ($object->status == $object::STATUS_DRAFT && $user->hasRight('facture', 'creer') && $action != 'valid' && $action != 'editline' && 'irv_addbelow' != $action) {
 			if ($action != 'editline') {
 				// Add free products/services
 

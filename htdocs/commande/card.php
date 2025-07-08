@@ -2968,7 +2968,7 @@ if ($action == 'create' && $usercancreate) {
 			/*
 			 * Form to add new line
 			 */
-			if ($object->statut == Commande::STATUS_DRAFT && $usercancreate && $action != 'selectlines') {
+			if ($object->statut == Commande::STATUS_DRAFT && $usercancreate && $action != 'selectlines' && 'irv_addbelow' != $action) {
 				if ($action != 'editline') {
 					// Add free products/services
 

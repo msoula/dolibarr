@@ -1541,7 +1541,7 @@ if ($action == 'create') {
 		// Form to add new line
 		//TODO : Droits
 		if ($object->statut == $object::STATUS_DRAFT && $usercancreate && $action != 'valid' && $action != 'editline') {
-			if ($action != 'editline') {
+			if ($action != 'editline' && 'irv_addbelow' != $action) {
 				// Add free products/services
 
 				$parameters = array();
