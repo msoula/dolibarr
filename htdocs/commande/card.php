@@ -308,7 +308,22 @@ if (empty($reshook)) {
 		$object->setProject(GETPOSTINT('projectid'));
 	} elseif ($action == 'add' && $usercancreate) {
 		// Add order
-		$datecommande = dol_mktime(12, 0, 0, GETPOSTINT('remonth'), GETPOSTINT('reday'), GETPOSTINT('reyear'));
+		// -----------------------------------------------------------------------
+		// U2042: autoset date value
+		// -----------------------------------------------------------------------
+		$newdatemonth = GETPOSTINT('remonth');
+		$newdateday   = GETPOSTINT('reday');
+		$newdateyear  = GETPOSTINT('reyear');
+		if (empty($newdate) && empty($newdateday) && empty($newdateyear)) {
+			$tmp = dol_getdate(dol_now('tzuserrel'));
+			$newdatemonth = $tmp['mon'];
+			$newdateday   = $tmp['mday'];
+			$newdateyear  = $tmp['year'];
+		}
+		$newdateinvoice = dol_mktime(12, 0, 0, GETPOSTINT('remonth'), GETPOSTINT('reday'), GETPOSTINT('reyear'));
+		// -----------------------------------------------------------------------
+		// END
+		// -----------------------------------------------------------------------
 		$date_delivery = dol_mktime(GETPOSTINT('liv_hour'), GETPOSTINT('liv_min'), 0, GETPOSTINT('liv_month'), GETPOSTINT('liv_day'), GETPOSTINT('liv_year'));
 
 		if ($datecommande == '') {

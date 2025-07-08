@@ -3974,17 +3974,22 @@ if ($action == 'create') {
 			print '</td></tr>';
 		}
 
-		// u2042: autoset date value
+		// -----------------------------------------------------------------------
+		// U2042: autoset date value
+		// -----------------------------------------------------------------------
 		$newdatemonth = GETPOSTINT('remonth');
 		$newdateday   = GETPOSTINT('reday');
 		$newdateyear  = GETPOSTINT('reyear');
 		if (empty($newdate) && empty($newdateday) && empty($newdateyear)) {
-			$tmp = dol_getdate(dol_now('tzuser'));
+			$tmp = dol_getdate(dol_now('tzuserrel'));
 			$newdatemonth = $tmp['mon'];
 			$newdateday   = $tmp['mday'];
 			$newdateyear  = $tmp['year'];
 		}
-		$newdateinvoice = dol_mktime(0, 0, 0, $newdatemonth, $newdateday, $newdateyear, 'tzserver');
+		$newdateinvoice = dol_mktime(12, 0, 0, $newdatemonth, $newdateday, $newdateyear, 'tzserver');
+		// -----------------------------------------------------------------------
+		// END
+		// -----------------------------------------------------------------------
 		$date_pointoftax = dol_mktime(0, 0, 0, GETPOSTINT('date_pointoftaxmonth'), GETPOSTINT('date_pointoftaxday'), GETPOSTINT('date_pointoftaxyear'), 'tzserver');
 
 		// Date invoice

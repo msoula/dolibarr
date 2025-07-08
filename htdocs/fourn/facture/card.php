@@ -2274,6 +2274,22 @@ if ($action == 'create') {
 		$transport_mode_id = !empty($societe->transport_mode_supplier_id) ? $societe->transport_mode_supplier_id : 0;
 		$fk_account = !empty($societe->fk_account) ? $societe->fk_account : 0;
 		$datetmp = dol_mktime(12, 0, 0, GETPOSTINT('remonth'), GETPOSTINT('reday'), GETPOSTINT('reyear'));
+		// -----------------------------------------------------------------------
+		// U2042: autoset date value
+		// -----------------------------------------------------------------------
+		$newdatemonth = GETPOSTINT('remonth');
+		$newdateday   = GETPOSTINT('reday');
+		$newdateyear  = GETPOSTINT('reyear');
+		if (empty($newdate) && empty($newdateday) && empty($newdateyear)) {
+			$tmp = dol_getdate(dol_now('tzuserrel'));
+			$newdatemonth = $tmp['mon'];
+			$newdateday   = $tmp['mday'];
+			$newdateyear  = $tmp['year'];
+		}
+		$datetmp = dol_mktime(12, 0, 0, $newdatemonth, $newdateday, $newdateyear, 'tzserver');
+		// -----------------------------------------------------------------------
+		// END
+		// -----------------------------------------------------------------------
 		$dateinvoice = ($datetmp == '' ? (getDolGlobalInt('MAIN_AUTOFILL_DATE') ? '' : -1) : $datetmp);
 		$datetmp = dol_mktime(12, 0, 0, GETPOSTINT('echmonth'), GETPOSTINT('echday'), GETPOSTINT('echyear'));
 		$datedue = ($datetmp == '' ? -1 : $datetmp);

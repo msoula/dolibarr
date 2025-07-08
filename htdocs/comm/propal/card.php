@@ -2086,7 +2086,22 @@ if ($action == 'create') {
 			print '</td></tr>';
 		}
 
-		$newdatepropal = dol_mktime(0, 0, 0, GETPOSTINT('remonth'), GETPOSTINT('reday'), GETPOSTINT('reyear'), 'tzserver');
+		// -----------------------------------------------------------------------
+		// U2042: autoset date value
+		// -----------------------------------------------------------------------
+		$newdatemonth = GETPOSTINT('remonth');
+		$newdateday   = GETPOSTINT('reday');
+		$newdateyear  = GETPOSTINT('reyear');
+		if (empty($newdate) && empty($newdateday) && empty($newdateyear)) {
+			$tmp = dol_getdate(dol_now('tzuserrel'));
+			$newdatemonth = $tmp['mon'];
+			$newdateday   = $tmp['mday'];
+			$newdateyear  = $tmp['year'];
+		}
+		$newdatepropal = dol_mktime(12, 0, 0, $newdatemonth, $newdateday, $newdateyear, 'tzserver');
+		// -----------------------------------------------------------------------
+		// END
+		// -----------------------------------------------------------------------
 		// Date
 		print '<tr class="field_addprop"><td class="titlefieldcreate fieldrequired">'.$langs->trans('DatePropal').'</td><td class="valuefieldcreate">';
 		print img_picto('', 'action', 'class="pictofixedwidth"');
