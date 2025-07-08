@@ -2171,7 +2171,7 @@ if ($action == 'create') {
 		// U2042
 		// -----------------------------------------------------------------------
 		// Thirdparty
-		$displayview = $soc->getNomUrl(1, 'supplier');
+		$displayview = $object->thirdparty->getNomUrl(1, 'supplier');
 		$parameters = [
 			'form' => &$form,
 			'page' => $_SERVER['PHP_SELF'].'?id='.$object->id,
