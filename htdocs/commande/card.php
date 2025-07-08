@@ -320,7 +320,7 @@ if (empty($reshook)) {
 			$newdateday   = $tmp['mday'];
 			$newdateyear  = $tmp['year'];
 		}
-		$newdateinvoice = dol_mktime(12, 0, 0, GETPOSTINT('remonth'), GETPOSTINT('reday'), GETPOSTINT('reyear'));
+		$datecommande = dol_mktime(12, 0, 0, GETPOSTINT('remonth'), GETPOSTINT('reday'), GETPOSTINT('reyear'));
 		// -----------------------------------------------------------------------
 		// END
 		// -----------------------------------------------------------------------
