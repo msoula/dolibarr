@@ -1455,7 +1455,7 @@ function pdf_writelinedesc(&$pdf, $object, $i, $outputlangs, $w, $h, $posx, $pos
 		if (!empty($object->lines[$i]->fk_parent_line) && $object->lines[$i]->fk_parent_line > 0) {
 			$special_code = $object->getSpecialCode($object->lines[$i]->fk_parent_line);
 		}
-		$parameters = array('pdf' => $pdf, 'i' => $i, 'outputlangs' => $outputlangs, 'w' => $w, 'h' => $h, 'posx' => $posx, 'posy' => $posy, 'hideref' => $hideref, 'hidedesc' => $hidedesc, 'issupplierline' => $issupplierline, 'special_code' => $special_code);
+		$parameters = array('pdf' => $pdf, 'i' => $i, 'outputlangs' => $outputlangs, 'w' => $w, 'h' => $h, 'posx' => $posx, 'posy' => $posy, 'hideref' => $hideref, 'hidedesc' => $hidedesc, 'issupplierline' => $issupplierline, 'special_code' => $special_code, 'align' => $align);
 		$action = '';
 		// WARNING: A hook must not close/open the PDF transaction. Doing this generates a lot of trouble.
 		// Test to know if content added by the hooks is already done by the main caller of pdf_writelinedesc
