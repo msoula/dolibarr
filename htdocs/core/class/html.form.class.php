@@ -3122,26 +3122,36 @@ class Form
 				if ($i > 0) {
 					$sql .= " AND ";
 				}
-				$sql .= "(p.ref LIKE '" . $this->db->escape($prefix . $crit) . "%' OR p.label LIKE '" . $this->db->escape($prefix . $crit) . "%'";
-				if (getDolGlobalInt('MAIN_MULTILANGS')) {
-					$sql .= " OR pl.label LIKE '" . $this->db->escape($prefix . $crit) . "%'";
-				}
-				if ((getDolGlobalString('PRODUIT_CUSTOMER_PRICES') || getDolGlobalString('PRODUIT_CUSTOMER_PRICES_AND_MULTIPRICES')) && !empty($socid)) {
-					$sql .= " OR pcp.ref_customer LIKE '" . $this->db->escape($prefix . $crit) . "%'";
-				}
-				if (getDolGlobalString('PRODUCT_AJAX_SEARCH_ON_DESCRIPTION')) {
-					$sql .= " OR p.description LIKE '" . $this->db->escape($prefix . $crit) . "%'";
+				// -------------------------------------------------------------------
+				// U2042: use stock quantity in query and wildcard
+				// -------------------------------------------------------------------
+				if (preg_match('/^stock(>|<|>=|<=|=)\d+$/i', $crit)) {
+					$sql .= "(p.".$crit.")";
+				} else {
+					$sql .= "(p.ref LIKE '" . $this->db->escape($prefix . $crit) . "%' OR p.label LIKE '" . $this->db->escape($prefix . $crit) . "%'";
 					if (getDolGlobalInt('MAIN_MULTILANGS')) {
-						$sql .= " OR pl.description LIKE '" . $this->db->escape($prefix . $crit) . "%'";
+						$sql .= " OR pl.label LIKE '" . $this->db->escape($prefix . $crit) . "%'";
 					}
-				}
+					if ((getDolGlobalString('PRODUIT_CUSTOMER_PRICES') || getDolGlobalString('PRODUIT_CUSTOMER_PRICES_AND_MULTIPRICES')) && !empty($socid)) {
+						$sql .= " OR pcp.ref_customer LIKE '" . $this->db->escape($prefix . $crit) . "%'";
+					}
+					if (getDolGlobalString('PRODUCT_AJAX_SEARCH_ON_DESCRIPTION')) {
+						$sql .= " OR p.description LIKE '" . $this->db->escape($prefix . $crit) . "%'";
+						if (getDolGlobalInt('MAIN_MULTILANGS')) {
+							$sql .= " OR pl.description LIKE '" . $this->db->escape($prefix . $crit) . "%'";
+						}
+					}
 
-				// include search in supplier ref
-				if (getDolGlobalString('MAIN_SEARCH_PRODUCT_BY_FOURN_REF')) {
-					$sqlSupplierSearch .= !empty($sqlSupplierSearch) ? ' AND ':'';
-					$sqlSupplierSearch .= " pfp.ref_fourn LIKE '" . $this->db->escape($prefix . $crit) . "%'";
+					// include search in supplier ref
+					if (getDolGlobalString('MAIN_SEARCH_PRODUCT_BY_FOURN_REF')) {
+						$sqlSupplierSearch .= !empty($sqlSupplierSearch) ? ' AND ':'';
+						$sqlSupplierSearch .= " pfp.ref_fourn LIKE '" . $this->db->escape($prefix . $crit) . "%'";
+					}
+					$sql .= ")";
 				}
-				$sql .= ")";
+				// -------------------------------------------------------------------
+				// END
+				// -------------------------------------------------------------------
 				$i++;
 			}
 			if (count($search_crit) > 1) {
@@ -3815,11 +3825,21 @@ class Form
 				if ($i > 0) {
 					$sql .= " AND ";
 				}
-				$sql .= "(pfp.ref_fourn LIKE '" . $this->db->escape($prefix . $crit) . "%' OR p.ref LIKE '" . $this->db->escape($prefix . $crit) . "%' OR p.label LIKE '" . $this->db->escape($prefix . $crit) . "%'";
-				if (getDolGlobalString('PRODUIT_FOURN_TEXTS')) {
-					$sql .= " OR pfp.desc_fourn LIKE '" . $this->db->escape($prefix . $crit) . "%'";
+				// -------------------------------------------------------------------
+				// U2042: use stock quantity in query and wildcard
+				// -------------------------------------------------------------------
+				if (preg_match('/^stock(>|<|>=|<=|=)\d+$/i', $crit)) {
+					$sql .= "(p.".$crit.")";
+				} else {
+					$sql .= "(pfp.ref_fourn LIKE '" . $this->db->escape($prefix . $crit) . "%' OR p.ref LIKE '" . $this->db->escape($prefix . $crit) . "%' OR p.label LIKE '" . $this->db->escape($prefix . $crit) . "%'";
+					if (getDolGlobalString('PRODUIT_FOURN_TEXTS')) {
+						$sql .= " OR pfp.desc_fourn LIKE '" . $this->db->escape($prefix . $crit) . "%'";
+					}
+					$sql .= ")";
 				}
-				$sql .= ")";
+				// -------------------------------------------------------------------
+				// END
+				// -------------------------------------------------------------------
 				$i++;
 			}
 			if (count($search_crit) > 1) {
