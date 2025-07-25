@@ -610,7 +610,13 @@ if (!empty($arrayfields['f.titre']['checked'])) {
 }
 // Thirdparty
 if (!empty($arrayfields['s.nom']['checked'])) {
-	print '<td class="liste_titre left"><input class="flat" type="text" size="8" name="search_societe" value="'.dol_escape_htmltag($search_societe).'"></td>';
+	//----------------------------------------------------------------------
+	// U2042: do not wrap or ellipsize thirdparty name
+	//----------------------------------------------------------------------
+	print '<td class="liste_titre left"><input class="flat centpercent" type="text" size="8" name="search_societe" value="'.dol_escape_htmltag($search_societe).'"></td>';
+	//----------------------------------------------------------------------
+	// END
+	//----------------------------------------------------------------------
 }
 if (!empty($arrayfields['f.total_ht']['checked'])) {
 	// Amount net
@@ -891,7 +897,13 @@ while ($i < $imaxinloop) {
 		}
 	}
 	if (!empty($arrayfields['s.nom']['checked'])) {
-		print '<td class="tdoverflowmax150">'.$companystatic->getNomUrl(1, 'supplier').'</td>';
+		//----------------------------------------------------------------------
+		// U2042: do not wrap or ellipsize thirdparty name
+		//----------------------------------------------------------------------
+		print '<td class="nowrap">'.$companystatic->getNomUrl(1, 'supplier').'</td>';
+		//----------------------------------------------------------------------
+		// END
+		//----------------------------------------------------------------------
 		if (!$i) {
 			$totalarray['nbfield']++;
 		}

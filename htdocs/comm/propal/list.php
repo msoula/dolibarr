@@ -1278,7 +1278,13 @@ if (!empty($arrayfields['pr.title']['checked'])) {
 }
 if (!empty($arrayfields['s.nom']['checked'])) {
 	print '<td class="liste_titre" align="left">';
-	print '<input class="flat maxwidth100" type="text" name="search_societe" value="'.dol_escape_htmltag($search_societe).'"'.($socid > 0 ? " disabled" : "").'>';
+	//----------------------------------------------------------------------
+	// U2042: do not wrap or ellipsize thirdparty name
+	//----------------------------------------------------------------------
+	print '<input class="flat centpercent" type="text" name="search_societe" value="'.dol_escape_htmltag($search_societe).'"'.($socid > 0 ? " disabled" : "").'>';
+	//----------------------------------------------------------------------
+	// END
+	//----------------------------------------------------------------------
 	print '</td>';
 }
 if (!empty($arrayfields['s.name_alias']['checked'])) {
@@ -1939,7 +1945,13 @@ while ($i < $imaxinloop) {
 
 		// Thirdparty
 		if (!empty($arrayfields['s.nom']['checked'])) {
-			print '<td class="tdoverflowmax150">';
+			//----------------------------------------------------------------------
+			// U2042: do not wrap or ellipsize thirdparty name
+			//----------------------------------------------------------------------
+			print '<td class="nowrap">';
+			//----------------------------------------------------------------------
+			// END
+			//----------------------------------------------------------------------
 			print $companystatic->getNomUrl(1, 'customer', 0, 0, 1, empty($arrayfields['s.name_alias']['checked']) ? 0 : 1);
 			print '</td>';
 			if (!$i) {

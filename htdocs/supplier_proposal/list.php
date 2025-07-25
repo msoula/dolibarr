@@ -781,7 +781,13 @@ if ($resql) {
 	}
 	if (!empty($arrayfields['s.nom']['checked'])) {
 		print '<td class="liste_titre left">';
-		print '<input class="flat" type="text" size="12" name="search_company" value="'.dol_escape_htmltag($search_company).'">';
+		//----------------------------------------------------------------------
+		// U2042: do not wrap or ellipsize thirdparty name
+		//----------------------------------------------------------------------
+		print '<input class="flat centpercent" type="text" size="12" name="search_company" value="'.dol_escape_htmltag($search_company).'">';
+		//----------------------------------------------------------------------
+		// END
+		//----------------------------------------------------------------------
 		print '</td>';
 	}
 	if (!empty($arrayfields['s.name_alias']['checked'])) {
@@ -1146,7 +1152,13 @@ if ($resql) {
 
 			// Thirdparty
 			if (!empty($arrayfields['s.nom']['checked'])) {
-				print '<td class="tdoverflowmax150">';
+				//----------------------------------------------------------------------
+				// U2042: do not wrap or ellipsize thirdparty name
+				//----------------------------------------------------------------------
+				print '<td class="nowrap">';
+				//----------------------------------------------------------------------
+				// END
+				//----------------------------------------------------------------------
 				print $companystatic->getNomUrl(1, 'supplier', 0, 0, -1, empty($arrayfields['s.name_alias']['checked']) ? 0 : 1);
 				print '</td>';
 				if (!$i) {

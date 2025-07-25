@@ -1421,7 +1421,13 @@ if ($resql) {
 	}
 	// Thirpdarty
 	if (!empty($arrayfields['cf.fk_soc']['checked'])) {
-		print '<td class="liste_titre"><input type="text" size="6" class="flat" name="search_company" value="'.$search_company.'"></td>';
+		//----------------------------------------------------------------------
+		// U2042: do not wrap or ellipsize thirdparty name
+		//----------------------------------------------------------------------
+		print '<td class="liste_titre"><input type="text" size="6" class="flat centpercent" name="search_company" value="'.$search_company.'"></td>';
+		//----------------------------------------------------------------------
+		// END
+		//----------------------------------------------------------------------
 	}
 	// Alias
 	if (!empty($arrayfields['s.name_alias']['checked'])) {
@@ -1866,7 +1872,13 @@ if ($resql) {
 			}
 			// Thirdparty
 			if (!empty($arrayfields['cf.fk_soc']['checked'])) {
-				print '<td class="tdoverflowmax150">';
+				//----------------------------------------------------------------------
+				// U2042: do not wrap or ellipsize thirdparty name
+				//----------------------------------------------------------------------
+				print '<td class="nowrap">';
+				//----------------------------------------------------------------------
+				// END
+				//----------------------------------------------------------------------
 				$thirdpartytmp->id = $obj->socid;
 				$thirdpartytmp->name = $obj->name;
 				$thirdpartytmp->email = $obj->email;

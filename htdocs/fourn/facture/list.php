@@ -1186,7 +1186,13 @@ if (!empty($arrayfields['p.ref']['checked'])) {
 }
 // Thirpdarty
 if (!empty($arrayfields['s.nom']['checked'])) {
-	print '<td class="liste_titre"><input class="flat maxwidth50" type="text" name="search_company" value="'.dol_escape_htmltag($search_company).'"'.($socid > 0 ? " disabled" : "").'></td>';
+	//----------------------------------------------------------------------
+	// U2042: do not wrap or ellipsize thirdparty name
+	//----------------------------------------------------------------------
+	print '<td class="liste_titre"><input class="flat centpercent" type="text" name="search_company" value="'.dol_escape_htmltag($search_company).'"'.($socid > 0 ? " disabled" : "").'></td>';
+	//----------------------------------------------------------------------
+	// END
+	//----------------------------------------------------------------------
 }
 // Alias
 if (!empty($arrayfields['s.name_alias']['checked'])) {
@@ -1786,7 +1792,13 @@ while ($i < $imaxinloop) {
 
 		// Third party
 		if (!empty($arrayfields['s.nom']['checked'])) {
-			print '<td class="tdoverflowmax125">';
+			//----------------------------------------------------------------------
+			// U2042: do not wrap or ellipsize thirdparty name
+			//----------------------------------------------------------------------
+			print '<td class="nowrap">';
+			//----------------------------------------------------------------------
+			// END
+			//----------------------------------------------------------------------
 			print $thirdparty->getNomUrl(1, 'supplier', 0, 0, -1, empty($arrayfields['s.name_alias']['checked']) ? 0 : 1);
 			print '</td>';
 			if (!$i) {

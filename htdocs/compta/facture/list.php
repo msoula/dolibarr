@@ -1495,7 +1495,13 @@ if (!empty($arrayfields['p.title']['checked'])) {
 }
 // Thirdparty
 if (!empty($arrayfields['s.nom']['checked'])) {
-	print '<td class="liste_titre"><input class="flat maxwidth75imp" type="text" name="search_company" value="'.dol_escape_htmltag($search_company).'"'.($socid > 0 ? " disabled" : "").'></td>';
+	//----------------------------------------------------------------------
+	// U2042: do not wrap or ellipsize thirdparty name
+	//----------------------------------------------------------------------
+	print '<td class="liste_titre"><input class="flat centpercent" type="text" name="search_company" value="'.dol_escape_htmltag($search_company).'"'.($socid > 0 ? " disabled" : "").'></td>';
+	//----------------------------------------------------------------------
+	// END
+	//----------------------------------------------------------------------
 }
 // Alias
 if (!empty($arrayfields['s.name_alias']['checked'])) {
@@ -2284,7 +2290,13 @@ if ($num > 0) {
 
 			// Third party
 			if (!empty($arrayfields['s.nom']['checked'])) {
-				print '<td class="tdoverflowmax150">';
+				//----------------------------------------------------------------------
+				// U2042: do not wrap or ellipsize thirdparty name
+				//----------------------------------------------------------------------
+				print '<td class="nowrap">';
+				//----------------------------------------------------------------------
+				// END
+				//----------------------------------------------------------------------
 				if ($contextpage == 'poslist') {
 					print dol_escape_htmltag($companystatic->name);
 				} else {

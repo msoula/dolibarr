@@ -1685,7 +1685,13 @@ if (!empty($arrayfields['p.title']['checked'])) {
 // Thirpdarty
 if (!empty($arrayfields['s.nom']['checked'])) {
 	print '<td class="liste_titre" align="left">';
-	print '<input class="flat maxwidth100" type="text" name="search_company" value="'.dol_escape_htmltag($search_company).'"'.(!empty($user->socid) ? " disabled" : "").'>';
+	//----------------------------------------------------------------------
+	// U2042: do not wrap or ellipsize thirdparty name
+	//----------------------------------------------------------------------
+	print '<input class="flat centpercent" type="text" name="search_company" value="'.dol_escape_htmltag($search_company).'"'.(!empty($user->socid) ? " disabled" : "").'>';
+	//----------------------------------------------------------------------
+	// END
+	//----------------------------------------------------------------------
 	print '</td>';
 }
 // Alias
@@ -2354,7 +2360,13 @@ while ($i < $imaxinloop) {
 
 		// Third party
 		if (!empty($arrayfields['s.nom']['checked'])) {
-			print '<td class="tdoverflowmax150">';
+			//----------------------------------------------------------------------
+			// U2042: do not wrap or ellipsize thirdparty name
+			//----------------------------------------------------------------------
+			print '<td class="nowrap">';
+			//----------------------------------------------------------------------
+			// END
+			//----------------------------------------------------------------------
 			if (getDolGlobalInt('MAIN_ENABLE_AJAX_TOOLTIP')) {
 				print $companystatic->getNomUrl(1, 'customer', 100, 0, 1, empty($arrayfields['s.name_alias']['checked']) ? 0 : 1);
 			} else {
