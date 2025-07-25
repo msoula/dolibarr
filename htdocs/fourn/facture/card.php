@@ -1051,12 +1051,18 @@ if (empty($reshook)) {
 				$action = 'create';
 			}
 
-			if (!GETPOST('ref_supplier')) {
-				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentities('RefSupplierBill')), null, 'errors');
-				$action = 'create';
-				//$_GET['socid'] = $_POST['socid'];
-				$error++;
-			}
+			// ---------------------------------------------------------------------
+			// U2042 : ref_supplier not required
+			// ---------------------------------------------------------------------
+			// if (!GETPOST('ref_supplier')) {
+			// 	setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentities('RefSupplierBill')), null, 'errors');
+			// 	$action = 'create';
+			// 	//$_GET['socid'] = $_POST['socid'];
+			// 	$error++;
+			// }
+			// ---------------------------------------------------------------------
+			// END
+			// ---------------------------------------------------------------------
 
 			if (getDolGlobalInt('INVOICE_SUBTYPE_ENABLED') && empty(GETPOST("subtype"))) {
 				$error++;
@@ -2466,7 +2472,13 @@ if ($action == 'create') {
 		}
 
 		// Ref supplier
-		print '<tr><td class="fieldrequired">'.$langs->trans('RefSupplierBill').'</td><td><input name="ref_supplier" value="'.(GETPOSTISSET('ref_supplier') ? GETPOST('ref_supplier') : (!empty($objectsrc->ref_supplier) ? $objectsrc->ref_supplier : '')).'" type="text"';
+		// -----------------------------------------------------------------------
+		// U2042: ref_supplier not required
+		// -----------------------------------------------------------------------
+		print '<tr><td>'.$langs->trans('RefSupplierBill').'</td><td><input name="ref_supplier" value="'.(GETPOSTISSET('ref_supplier') ? GETPOST('ref_supplier') : (!empty($objectsrc->ref_supplier) ? $objectsrc->ref_supplier : '')).'" type="text"';
+		// -----------------------------------------------------------------------
+		// END
+		// -----------------------------------------------------------------------
 		if (!empty($societe->id) && $societe->id > 0) {
 			print ' autofocus';
 		}
