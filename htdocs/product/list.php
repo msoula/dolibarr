@@ -1182,9 +1182,19 @@ if (!empty($arrayfields['p.desiredstock']['checked'])) {
 	print '</td>';
 }
 // Stock
+// ---------------------------------------------------------------------------
+// U2042 : custom stock field title
+// ---------------------------------------------------------------------------
 if (!empty($arrayfields['p.stock']['checked'])) {
-	print '<td class="liste_titre">&nbsp;</td>';
+	$parameters = [];
+	$reshook = $hookmanager->executeHooks('productListStockFieldTitleSearch', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+	if (empty($reshook)) {
+		print '<td class="liste_titre">&nbsp;</td>';
+	}
 }
+// ---------------------------------------------------------------------------
+// END : custom stock field title
+// ---------------------------------------------------------------------------
 // Stock
 if (!empty($arrayfields['stock_virtual']['checked'])) {
 	print '<td class="liste_titre">&nbsp;</td>';
@@ -1427,10 +1437,26 @@ if (!empty($arrayfields['p.desiredstock']['checked'])) {
 	print_liste_field_titre($arrayfields['p.desiredstock']['label'], $_SERVER["PHP_SELF"], "p.desiredstock", "", $param, '', $sortfield, $sortorder, 'right ');
 	$totalarray['nbfield']++;
 }
+// ---------------------------------------------------------------------------
+// U2042 : custom stock field title
+// ---------------------------------------------------------------------------
 if (!empty($arrayfields['p.stock']['checked'])) {
-	print_liste_field_titre($arrayfields['p.stock']['label'], $_SERVER["PHP_SELF"], "p.stock", "", $param, '', $sortfield, $sortorder, 'right ');
-	$totalarray['nbfield']++;
+	$parameters = [
+		'arrayfields' => &$arrayfields,
+		'totalarray' => &$totalarray,
+		'param' => $param,
+		'sortfield' => $sortfield,
+		'sortorder' => $sortorder
+	];
+	$reshook = $hookmanager->executeHooks('productListStockFieldTitle', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+	if (empty($reshook)) {
+		print_liste_field_titre($arrayfields['p.stock']['label'], $_SERVER["PHP_SELF"], "p.stock", "", $param, '', $sortfield, $sortorder, 'right ');
+		$totalarray['nbfield']++;
+	}
 }
+// ---------------------------------------------------------------------------
+// END : custom stock field title
+// ---------------------------------------------------------------------------
 if (!empty($arrayfields['stock_virtual']['checked'])) {
 	print_liste_field_titre($arrayfields['stock_virtual']['label'], $_SERVER["PHP_SELF"], "", "", $param, '', $sortfield, $sortorder, 'right ', 'VirtualStockDesc');
 	$totalarray['nbfield']++;
@@ -2092,25 +2118,40 @@ while ($i < $imaxinloop) {
 		}
 		// Stock real
 		if (!empty($arrayfields['p.stock']['checked'])) {
-			print '<td class="right">';
-			if ($product_static->type != 1) {
-				if ($obj->seuil_stock_alerte != '' && $product_static->stock_reel < (float) $obj->seuil_stock_alerte) {
-					print img_warning($langs->trans("StockLowerThanLimit", $obj->seuil_stock_alerte)).' ';
+			// ---------------------------------------------------------------------------
+			// U2042 : custom stock field
+			// ---------------------------------------------------------------------------
+			$parameters = [
+				'totalarray' => &$totalarray,
+				'obj' => &$obj,
+				'i' => $i,
+				'usercancreadprice' => $usercancreadprice
+			];
+			$reshook = $hookmanager->executeHooks('productListStockField', $parameters, $product_static, $action); // Note that $action and $object may have been modified by some hooks
+			if (empty($reshook)) {
+				print '<td class="right">';
+				if ($product_static->type != 1) {
+					if ($obj->seuil_stock_alerte != '' && $product_static->stock_reel < (float) $obj->seuil_stock_alerte) {
+						print img_warning($langs->trans("StockLowerThanLimit", $obj->seuil_stock_alerte)).' ';
+					}
+					if ($usercancreadprice) {
+						if ($product_static->stock_reel < 0) {
+							print '<span class="warning">';
+						}
+						print price(price2num($product_static->stock_reel, 'MS'), 0, $langs, 1, 0);
+						if ($product_static->stock_reel < 0) {
+							print '</span>';
+						}
+					}
 				}
-				if ($usercancreadprice) {
-					if ($product_static->stock_reel < 0) {
-						print '<span class="warning">';
-					}
-					print price(price2num($product_static->stock_reel, 'MS'), 0, $langs, 1, 0);
-					if ($product_static->stock_reel < 0) {
-						print '</span>';
-					}
+				print '</td>';
+				if (!$i) {
+					$totalarray['nbfield']++;
 				}
 			}
-			print '</td>';
-			if (!$i) {
-				$totalarray['nbfield']++;
-			}
+			// ---------------------------------------------------------------------------
+			// END : custom stock field title
+			// ---------------------------------------------------------------------------
 		}
 		// Stock virtual
 		if (!empty($arrayfields['stock_virtual']['checked'])) {
