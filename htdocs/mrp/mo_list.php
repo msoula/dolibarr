@@ -264,7 +264,8 @@ foreach ($search as $key => $val) {
 		}
 
 		if ($key == 'status') {
-			$sql .= natural_search('t.status', $search[$key], 0);
+			// U2042: had fixed the mode parameter here
+			$sql .= natural_search('t.status', $search[$key], 2);
 			continue;
 		}
 
