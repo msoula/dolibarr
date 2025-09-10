@@ -467,13 +467,25 @@ if ($resql) {
 	// Stock limit
 	print '<td class="liste_titre">&nbsp;</td>';
 	print '<td class="liste_titre right">&nbsp;</td>';
-	// Physical stock
-	print '<td class="liste_titre right">';
-	print '<input class="flat" type="text" size="5" name="search_stock_physique" value="'.dol_escape_htmltag($search_stock_physique).'">';
-	print '</td>';
-	if ($virtualdiffersfromphysical) {
-		print '<td class="liste_titre">&nbsp;</td>';
+	// ---------------------------------------------------------------------------
+	// U2042 : custom stock field title search
+	// ---------------------------------------------------------------------------
+	$parameters = [
+		'search_stock_physique' => $search_stock_physique,
+		'virtualdiffersfromphysical' => $virtualdiffersfromphysical
+	];
+	$reshook = $hookmanager->executeHooks('productReassortStockFieldTitleSearch', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+	if (empty($reshook)) {
+		print '<td class="liste_titre right">';
+		print '<input class="flat" type="text" size="5" name="search_stock_physique" value="'.dol_escape_htmltag($search_stock_physique).'">';
+		print '</td>';
+		if ($virtualdiffersfromphysical) {
+			print '<td class="liste_titre">&nbsp;</td>';
+		}
 	}
+	// ---------------------------------------------------------------------------
+	// END : custom stock field title
+	// ---------------------------------------------------------------------------
 	print '<td class="liste_titre">&nbsp;</td>';
 	print '<td class="liste_titre" colspan="'.$colspan_warehouse.'">&nbsp;</td>';
 	print '<td class="liste_titre"></td>';
@@ -501,18 +513,33 @@ if ($resql) {
 	}
 	print_liste_field_titre("StockLimit", $_SERVER["PHP_SELF"], "p.seuil_stock_alerte", '', $param, "", $sortfield, $sortorder, 'right ');
 	print_liste_field_titre("DesiredStock", $_SERVER["PHP_SELF"], "p.desiredstock", '', $param, "", $sortfield, $sortorder, 'right ');
-	print_liste_field_titre("PhysicalStock", $_SERVER["PHP_SELF"], "stock_physique", '', $param, "", $sortfield, $sortorder, 'right ');
-	// Details per warehouse
-	if (getDolGlobalString('STOCK_DETAIL_ON_WAREHOUSE')) {	// TODO This should be moved into the selection of fields on page product/list (page product/stock will be removed and replaced with product/list with its own context)
-		if ($nb_warehouse > 1) {
-			foreach ($warehouses_list as &$wh) {
-				print_liste_field_titre($wh['label'], '', '', '', '', '', '', '', 'right ');
+	// ---------------------------------------------------------------------------
+	// U2042 : custom stock field title
+	// ---------------------------------------------------------------------------
+	$parameters = [
+		'param' => $param,
+		'sortfield' => $sortfield,
+		'sortorder' => $sortorder,
+		'virtualdiffersfromphysical' => $virtualdiffersfromphysical
+	];
+	$reshook = $hookmanager->executeHooks('productReassortStockFieldTitle', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+	if (empty($reshook)) {
+		print_liste_field_titre("PhysicalStock", $_SERVER["PHP_SELF"], "stock_physique", '', $param, "", $sortfield, $sortorder, 'right ');
+		// Details per warehouse
+		if (getDolGlobalString('STOCK_DETAIL_ON_WAREHOUSE')) {	// TODO This should be moved into the selection of fields on page product/list (page product/stock will be removed and replaced with product/list with its own context)
+			if ($nb_warehouse > 1) {
+				foreach ($warehouses_list as &$wh) {
+					print_liste_field_titre($wh['label'], '', '', '', '', '', '', '', 'right ');
+				}
 			}
 		}
+		if ($virtualdiffersfromphysical) {
+			print_liste_field_titre("VirtualStock", $_SERVER["PHP_SELF"], "", '', $param, "", $sortfield, $sortorder, 'right ', 'VirtualStockDesc');
+		}
 	}
-	if ($virtualdiffersfromphysical) {
-		print_liste_field_titre("VirtualStock", $_SERVER["PHP_SELF"], "", '', $param, "", $sortfield, $sortorder, 'right ', 'VirtualStockDesc');
-	}
+	// ---------------------------------------------------------------------------
+	// END : custom stock field title
+	// ---------------------------------------------------------------------------
 	// Units
 	if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 		print_liste_field_titre("Unit", $_SERVER["PHP_SELF"], "unit_short", '', $param, 'align="right"', $sortfield, $sortorder);
@@ -568,46 +595,59 @@ if ($resql) {
 		print '<td class="right">';
 		print $objp->desiredstock;
 		print '</td>';
-		// Real stock
-		print '<td class="right">';
-		if ($objp->seuil_stock_alerte != '' && ($objp->stock_physique < $objp->seuil_stock_alerte)) {
-			print img_warning($langs->trans("StockLowerThanLimit", $objp->seuil_stock_alerte)).' ';
-		}
-		if ($objp->stock_physique < 0) {
-			print '<span class="warning">';
-		}
-		print price(price2num($objp->stock_physique, 'MS'), 0, $langs, 1, 0);
-		if ($objp->stock_physique < 0) {
-			print '</span>';
-		}
-		print '</td>';
-
-		// Details per warehouse
-		if (getDolGlobalString('STOCK_DETAIL_ON_WAREHOUSE')) {	// TODO This should be moved into the selection of fields on page product/list (page product/stock will be removed and replaced with product/list with its own context)
-			if ($nb_warehouse > 1) {
-				foreach ($warehouses_list as &$wh) {
-					print '<td class="right">';
-					print price(empty($product->stock_warehouse[$wh['id']]->real) ? 0 : price2num($product->stock_warehouse[$wh['id']]->real, 'MS'), 0, $langs, 1, 0);
-					print '</td>';
-				}
-			}
-		}
-
-		// Virtual stock
-		if ($virtualdiffersfromphysical) {
+		// ---------------------------------------------------------------------------
+		// U2042 : custom stock field
+		// ---------------------------------------------------------------------------
+		$parameters = [
+			'obj' => &$objp,
+			'virtualdiffersfromphysical' => $virtualdiffersfromphysical
+		];
+		$reshook = $hookmanager->executeHooks('productReassortStockField', $parameters, $product, $action); // Note that $action and $object may have been modified by some hooks
+		if (empty($reshook)) {
+			// Real stock
 			print '<td class="right">';
-			if ($objp->seuil_stock_alerte != '' && ($product->stock_theorique < (float) $objp->seuil_stock_alerte)) {
+			if ($objp->seuil_stock_alerte != '' && ($objp->stock_physique < $objp->seuil_stock_alerte)) {
 				print img_warning($langs->trans("StockLowerThanLimit", $objp->seuil_stock_alerte)).' ';
 			}
 			if ($objp->stock_physique < 0) {
 				print '<span class="warning">';
 			}
-			print price(price2num($product->stock_theorique, 'MS'), 0, $langs, 1, 0);
+			print price(price2num($objp->stock_physique, 'MS'), 0, $langs, 1, 0);
 			if ($objp->stock_physique < 0) {
 				print '</span>';
 			}
 			print '</td>';
+
+			// Details per warehouse
+			if (getDolGlobalString('STOCK_DETAIL_ON_WAREHOUSE')) {	// TODO This should be moved into the selection of fields on page product/list (page product/stock will be removed and replaced with product/list with its own context)
+				if ($nb_warehouse > 1) {
+					foreach ($warehouses_list as &$wh) {
+						print '<td class="right">';
+						print price(empty($product->stock_warehouse[$wh['id']]->real) ? 0 : price2num($product->stock_warehouse[$wh['id']]->real, 'MS'), 0, $langs, 1, 0);
+						print '</td>';
+					}
+				}
+			}
+
+			// Virtual stock
+			if ($virtualdiffersfromphysical) {
+				print '<td class="right">';
+				if ($objp->seuil_stock_alerte != '' && ($product->stock_theorique < (float) $objp->seuil_stock_alerte)) {
+					print img_warning($langs->trans("StockLowerThanLimit", $objp->seuil_stock_alerte)).' ';
+				}
+				if ($objp->stock_physique < 0) {
+					print '<span class="warning">';
+				}
+				print price(price2num($product->stock_theorique, 'MS'), 0, $langs, 1, 0);
+				if ($objp->stock_physique < 0) {
+					print '</span>';
+				}
+				print '</td>';
+			}
 		}
+		// ---------------------------------------------------------------------------
+		// END : custom stock field title
+		// ---------------------------------------------------------------------------
 		// Units
 		if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 			print '<td class="left">'.dol_escape_htmltag($objp->unit_short).'</td>';
