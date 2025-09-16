@@ -733,11 +733,6 @@ if ($id > 0 || $ref) {
 
 			print '<table class="border tableforfield centpercent">';
 
-			// Stock alert threshold
-			print '<tr><td>'.$form->editfieldkey($form->textwithpicto($langs->trans("StockLimit"), $langs->trans("StockLimitDesc"), 1), 'seuil_stock_alerte', $object->seuil_stock_alerte, $object, $user->hasRight('produit', 'creer')).'</td><td>';
-			print $form->editfieldval("StockLimit", 'seuil_stock_alerte', $object->seuil_stock_alerte, $object, $user->hasRight('produit', 'creer'), 'string');
-			print '</td></tr>';
-
 			// Desired stock
 			// ---------------------------------------------------------------------------
 			// U2042 : custom stock field title
@@ -745,6 +740,11 @@ if ($id > 0 || $ref) {
 			$parameters = ['arrayfields' => &$arrayfields];
 			$reshook = $hookmanager->executeHooks('productStockProductStockField', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 			if (empty($reshook)) {
+				// Stock alert threshold
+				print '<tr><td>'.$form->editfieldkey($form->textwithpicto($langs->trans("StockLimit"), $langs->trans("StockLimitDesc"), 1), 'seuil_stock_alerte', $object->seuil_stock_alerte, $object, $user->hasRight('produit', 'creer')).'</td><td>';
+				print $form->editfieldval("StockLimit", 'seuil_stock_alerte', $object->seuil_stock_alerte, $object, $user->hasRight('produit', 'creer'), 'string');
+				print '</td></tr>';
+
 				print '<tr><td>'.$form->editfieldkey($form->textwithpicto($langs->trans("DesiredStock"), $langs->trans("DesiredStockDesc"), 1), 'desiredstock', $object->desiredstock, $object, $user->hasRight('produit', 'creer'));
 				print '</td><td>';
 				print $form->editfieldval("DesiredStock", 'desiredstock', $object->desiredstock, $object, $user->hasRight('produit', 'creer'), 'string');
