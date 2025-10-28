@@ -1789,7 +1789,7 @@ if (empty($reshook)) {
 									0,
 									'HT',
 									0,
-									0, // product_type
+									1, // product_type (U2042: this is a service, not a product)
 									1,
 									$i >= 0 ? $lines[$i]->special_code : 0,
 									$object->origin,
