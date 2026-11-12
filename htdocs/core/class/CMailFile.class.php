@@ -627,7 +627,7 @@ class CMailFile
 				foreach ($filename_list as $i => $val) {
 					$content = file_get_contents($filename_list[$i]);
 					if (empty($cid_list[$i])) {
-						$smtps->setAttachment($content, $mimefilename_list[$i], $mimetype_list[$i], (empty($cid_list[$i]) ? '' : $cid_list[$i]));
+						$smtps->setAttachment($content, (empty($mimefilename_list[$i]) ? '' : $mimefilename_list[$i]), (empty($mimetype_list[$i]) ? '' : $mimetype_list[$i]), (empty($cid_list[$i]) ? '' : $cid_list[$i]));
 					}
 				}
 			}
