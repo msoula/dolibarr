@@ -41,7 +41,7 @@ require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmdirectory.class.php';
  */
 
 // Load translation files required by the page
-$langs->loadLangs(array("ecm", "companies", "other", "users", "orders", "propal", "bills", "contracts"));
+$langs->loadLangs(array("ecm", "companies", "other", "users", "orders", "propal", "bills", "contracts", "sendings"));
 
 // Security check
 if ($user->socid) {
@@ -200,6 +200,10 @@ if (isModEnabled('recruitment')) {
 	$langs->load("recruitment");
 	$rowspan++;
 	$sectionauto[] = array('level' => 1, 'module' => 'recruitment-recruitmentcandidature', 'test' => isModEnabled('recruitment'), 'label' => $langs->trans("Candidatures"), 'desc' => $langs->trans("ECMDocsBy", $langs->transnoentitiesnoconv("JobApplications")));
+}
+if (isModEnabled('expedition')) {
+	$rowspan++;
+	$sectionauto[] = array('level' => 1, 'module' => 'expedition', 'test' => isModEnabled('expedition'), 'label' => $langs->trans("Shipments"), 'desc' => $langs->trans("ECMDocsBy", $langs->transnoentitiesnoconv("Shipments")));
 }
 
 

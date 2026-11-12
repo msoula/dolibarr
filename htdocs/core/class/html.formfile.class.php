@@ -1989,6 +1989,9 @@ class FormFile
 		} elseif ($modulepart == 'mrp-mo') {
 			include_once DOL_DOCUMENT_ROOT.'/mrp/class/mo.class.php';
 			$object_instance = new Mo($this->db);
+		} elseif ($modulepart == 'expedition') {
+			include_once DOL_DOCUMENT_ROOT.'/expedition/class/expedition.class.php';
+			$object_instance = new Expedition($this->db);
 		} else {
 			$parameters = array('modulepart' => $modulepart);
 			$reshook = $hookmanager->executeHooks('addSectionECMAuto', $parameters);
@@ -2069,6 +2072,7 @@ class FormFile
 					'expensereport',
 					'recruitment-recruitmentcandidature',
 					'mrp-mo',
+					'expedition',
 					'banque',
 					'chequereceipt',
 					'holiday'))) {
