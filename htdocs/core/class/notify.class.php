@@ -769,6 +769,7 @@ class Notify
 								$mesg = $outputlangs->transnoentitiesnoconv("EMailTextInvoiceCanceled", $link);
 								break;
 							case 'BILL_VALIDATE':
+							case 'IZ_ORDER_COMPLETE_INVOICE':
 								$link = '<a href="'.$urlwithroot.'/compta/facture/card.php?facid='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
 								$dir_output = $conf->facture->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'invoice');
 								$object_type = 'facture';
@@ -900,6 +901,7 @@ class Notify
 								$mesg = $outputlangs->transnoentitiesnoconv("EMailTextExpeditionModified", $link, $context_info);
 								break;
 							case 'SHIPPING_VALIDATE':
+							case 'IZ_ORDER_COMPLETE_SHIPPING':
 								$link = '<a href="'.$urlwithroot.'/expedition/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
 								$dir_output = $conf->expedition->dir_output."/sending/".get_exdir(0, 0, 0, 1, $object, 'shipment');
 								$object_type = 'shipping';
@@ -1043,18 +1045,24 @@ class Notify
 							return -1;
 						}
 
-						if ($mailfile->sendfile()) {
-							if ($obj->type_target == 'touserid') {
-								$sql = "INSERT INTO ".$this->db->prefix()."notify (daten, fk_action, fk_soc, fk_user, type, objet_type, type_target, objet_id, email)";
-								// @phan-suppress-next-line PhanUndeclaredProperty
-								$sql .= " VALUES ('".$this->db->idate(dol_now())."', ".((int) $notifcodedefid).", ".($object->socid > 0 ? ((int) $object->socid) : 'null').", ".((int) $obj->cid).", '".$this->db->escape($obj->type)."', '".$this->db->escape($object_type)."', '".$this->db->escape($obj->type_target)."', ".((int) $object->id).", '".$this->db->escape($obj->email)."')";
+						$sendresult = $mailfile->sendfile();
+						if ($sendresult) {
+							if (true === $sendresult) {
+								if ($obj->type_target == 'touserid') {
+									$sql = "INSERT INTO ".$this->db->prefix()."notify (daten, fk_action, fk_soc, fk_user, type, objet_type, type_target, objet_id, email)";
+									// @phan-suppress-next-line PhanUndeclaredProperty
+									$sql .= " VALUES ('".$this->db->idate(dol_now())."', ".((int) $notifcodedefid).", ".($object->socid > 0 ? ((int) $object->socid) : 'null').", ".((int) $obj->cid).", '".$this->db->escape($obj->type)."', '".$this->db->escape($object_type)."', '".$this->db->escape($obj->type_target)."', ".((int) $object->id).", '".$this->db->escape($obj->email)."')";
+								} else {
+									$sql = "INSERT INTO ".$this->db->prefix()."notify (daten, fk_action, fk_soc, fk_contact, type, objet_type, type_target, objet_id, email)";
+									// @phan-suppress-next-line PhanUndeclaredProperty
+									$sql .= " VALUES ('".$this->db->idate(dol_now())."', ".((int) $notifcodedefid).", ".($object->socid > 0 ? ((int) $object->socid) : 'null').", ".((int) $obj->cid).", '".$this->db->escape($obj->type)."', '".$this->db->escape($object_type)."', '".$this->db->escape($obj->type_target)."', ".((int) $object->id).", '".$this->db->escape($obj->email)."')";
+								}
+								if (!$this->db->query($sql)) {
+									dol_print_error($this->db);
+								}
 							} else {
-								$sql = "INSERT INTO ".$this->db->prefix()."notify (daten, fk_action, fk_soc, fk_contact, type, objet_type, type_target, objet_id, email)";
-								// @phan-suppress-next-line PhanUndeclaredProperty
-								$sql .= " VALUES ('".$this->db->idate(dol_now())."', ".((int) $notifcodedefid).", ".($object->socid > 0 ? ((int) $object->socid) : 'null').", ".((int) $obj->cid).", '".$this->db->escape($obj->type)."', '".$this->db->escape($object_type)."', '".$this->db->escape($obj->type_target)."', ".((int) $object->id).", '".$this->db->escape($obj->email)."')";
-							}
-							if (!$this->db->query($sql)) {
-								dol_print_error($this->db);
+								// InzaiTea: let modules react to a send failure (e.g. create a ticket)
+								$hookmanager->executeHooks('notifsendfailure', $parameters, $object, $action);
 							}
 						} else {
 							$error++;
@@ -1109,6 +1117,7 @@ class Notify
 
 				switch ($notifcode) {
 					case 'BILL_VALIDATE':
+					case 'IZ_ORDER_COMPLETE_INVOICE':
 						$link = '<a href="'.$urlwithroot.'/compta/facture/card.php?facid='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
 						$dir_output = $conf->facture->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'invoice');
 						$object_type = 'facture';
@@ -1146,26 +1155,26 @@ class Notify
 						break;
 					case 'FICHINTER_ADD_CONTACT':
 						$link = '<a href="'.$urlwithroot.'/fichinter/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->ficheinter->dir_output;
+						$dir_output = $conf->ficheinter->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'fichinter');
 						$object_type = 'fichinter';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextInterventionAddedContact", $link);
 						break;
 					case 'FICHINTER_VALIDATE':
 						$link = '<a href="'.$urlwithroot.'/fichinter/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->facture->dir_output;
+						$dir_output = $conf->ficheinter->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'fichinter');
 						$object_type = 'fichinter';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextInterventionValidated", $link);
 						break;
 					case 'FICHINTER_MODIFY':
 						$link = '<a href="'.$urlwithroot.'/fichinter/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
 						$context_info = array_key_exists('signature', $object->context) ? $object->getLibSignedStatus() : '';
-						$dir_output = $conf->ficheinter->dir_output;
+						$dir_output = $conf->ficheinter->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'fichinter');
 						$object_type = 'fichinter';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextInterventionModified", $link, $context_info);
 						break;
 					case 'FICHINTER_CLOSE':
 						$link = '<a href="'.$urlwithroot.'/fichinter/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->facture->dir_output;
+						$dir_output = $conf->ficheinter->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'fichinter');
 						$object_type = 'fichinter';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextInterventionClosed", $link);
 						break;
@@ -1217,6 +1226,7 @@ class Notify
 						$mesg = $langs->transnoentitiesnoconv("EMailTextExpeditionModified", $link, $context_info);
 						break;
 					case 'SHIPPING_VALIDATE':
+					case 'IZ_ORDER_COMPLETE_SHIPPING':
 						$link = '<a href="'.$urlwithroot.'/expedition/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
 						$dir_output = $conf->expedition->dir_output."/sending/".get_exdir(0, 0, 0, 1, $object, 'shipment');
 						$object_type = 'order_supplier';
@@ -1224,31 +1234,31 @@ class Notify
 						break;
 					case 'EXPENSE_REPORT_VALIDATE':
 						$link = '<a href="'.$urlwithroot.'/expensereport/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->expensereport->dir_output;
+						$dir_output = $conf->expensereport->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'expensereport');
 						$object_type = 'expensereport';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextExpenseReportValidated", $link);
 						break;
 					case 'EXPENSE_REPORT_APPROVE':
 						$link = '<a href="'.$urlwithroot.'/expensereport/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->expensereport->dir_output;
+						$dir_output = $conf->expensereport->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'expensereport');
 						$object_type = 'expensereport';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextExpenseReportApproved", $link);
 						break;
 					case 'HOLIDAY_VALIDATE':
 						$link = '<a href="'.$urlwithroot.'/holiday/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->holiday->dir_output;
+						$dir_output = $conf->holiday->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'holiday');
 						$object_type = 'holiday';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextHolidayValidated", $link);
 						break;
 					case 'HOLIDAY_APPROVE':
 						$link = '<a href="'.$urlwithroot.'/holiday/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->holiday->dir_output;
+						$dir_output = $conf->holiday->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'holiday');
 						$object_type = 'holiday';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextHolidayApproved", $link);
 						break;
 					case 'ACTION_CREATE':
 						$link = '<a href="'.$urlwithroot.'/comm/action/card.php?id='.$object->id.'&entity='.$object->entity.'">'.$newref.'</a>';
-						$dir_output = $conf->agenda->dir_output;
+						$dir_output = $conf->agenda->dir_output."/".get_exdir(0, 0, 0, 1, $object, 'agenda');
 						$object_type = 'action';
 						$mesg = $langs->transnoentitiesnoconv("EMailTextActionAdded", $link);
 						break;
@@ -1365,12 +1375,18 @@ class Notify
 						return -1;
 					}
 
-					if ($mailfile->sendfile()) {
-						$sql = "INSERT INTO ".$this->db->prefix()."notify (daten, fk_action, fk_soc, fk_contact, type, type_target, objet_type, objet_id, email)";
-						// @phan-suppress-next-line PhanUndeclaredProperty
-						$sql .= " VALUES ('".$this->db->idate(dol_now())."', ".((int) $notifcodedefid).", ".((!empty($object->socid)  && $object->socid > 0) ? ((int) $object->socid) : 'null').", null, 'email', 'tofixedemail', '".$this->db->escape($object_type)."', ".((int) $object->id).", '".$this->db->escape($sendto)."')";
-						if (!$this->db->query($sql)) {
-							dol_print_error($this->db);
+					$sendresult = $mailfile->sendfile();
+					if ($sendresult) {
+						if (true === $sendresult) {
+							$sql = "INSERT INTO ".$this->db->prefix()."notify (daten, fk_action, fk_soc, fk_contact, type, type_target, objet_type, objet_id, email)";
+							// @phan-suppress-next-line PhanUndeclaredProperty
+							$sql .= " VALUES ('".$this->db->idate(dol_now())."', ".((int) $notifcodedefid).", ".((!empty($object->socid)  && $object->socid > 0) ? ((int) $object->socid) : 'null').", null, 'email', 'tofixedemail', '".$this->db->escape($object_type)."', ".((int) $object->id).", '".$this->db->escape($sendto)."')";
+							if (!$this->db->query($sql)) {
+								dol_print_error($this->db);
+							}
+						} else {
+							// InzaiTea: let modules react to a send failure (e.g. create a ticket)
+							$hookmanager->executeHooks('notifsendfailure', $parameters, $object, $action);
 						}
 					} else {
 						$error++;
