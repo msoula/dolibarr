@@ -163,6 +163,7 @@ class Documents extends DolibarrApi
 	 * @param   string  $original_file  Relative path with filename, relative to modulepart (for example: IN201701-999/IN201701-999.pdf).
 	 * @param	string	$doctemplate	Set here the doc template to use for document generation (If not set, use the default template).
 	 * @param	string	$langcode		Language code like 'en_US', 'fr_FR', 'es_ES', ... (If not set, use the default language).
+	 * @param	array|string	$userdata		Optional data passed to the document template as $moreparams (key => value).
 	 * @return  array                   List of documents
 	 * @phan-return array{filename:string,content-type:string,filesize:false|int,content:string,langcode:string,template:?string,encoding:string}
 	 * @phpstan-return array{filename:string,content-type:string,filesize:false|int,content:string,langcode:string,template:?string,encoding:string}
@@ -175,7 +176,7 @@ class Documents extends DolibarrApi
 	 * @throws	RestException	500		Error generating document
 	 * @throws	RestException	501		File not found
 	 */
-	public function builddoc($modulepart, $original_file = '', $doctemplate = '', $langcode = '')
+	public function builddoc($modulepart, $original_file = '', $doctemplate = '', $langcode = '', $userdata = '')
 	{
 		global $conf, $langs;
 
@@ -190,6 +191,14 @@ class Documents extends DolibarrApi
 		if ($langcode && $langs->defaultlang != $langcode) {
 			$outputlangs = new Translate('', $conf);
 			$outputlangs->setDefaultLang($langcode);
+		}
+
+		// Load user data, given to the document template as $moreparams
+		$moreparams = array();
+		if (!empty($userdata) && is_array($userdata)) {
+			foreach ($userdata as $field => $value) {
+				$moreparams[$field] = $value;
+			}
 		}
 
 		//--- Finds and returns the document
@@ -255,7 +264,7 @@ class Documents extends DolibarrApi
 			}
 
 			$templateused = $doctemplate ? $doctemplate : $tmpobject->model_pdf;
-			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref);
+			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 			if ($result <= 0) {
 				throw new RestException(500, 'Error generating document');
 			}
@@ -268,7 +277,7 @@ class Documents extends DolibarrApi
 			}
 
 			$templateused = $doctemplate ? $doctemplate : $tmpobject->model_pdf;
-			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref);
+			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 			if ($result < 0) {
 				throw new RestException(500, 'Error generating document');
 			}
@@ -280,7 +289,7 @@ class Documents extends DolibarrApi
 				throw new RestException(404, 'Order not found');
 			}
 			$templateused = $doctemplate ? $doctemplate : $tmpobject->model_pdf;
-			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref);
+			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 			if ($result <= 0) {
 				throw new RestException(500, 'Error generating document');
 			}
@@ -292,7 +301,7 @@ class Documents extends DolibarrApi
 				throw new RestException(404, 'Proposal not found');
 			}
 			$templateused = $doctemplate ? $doctemplate : $tmpobject->model_pdf;
-			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref);
+			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 			if ($result <= 0) {
 				throw new RestException(500, 'Error generating document');
 			}
@@ -307,7 +316,7 @@ class Documents extends DolibarrApi
 			}
 
 			$templateused = $doctemplate ? $doctemplate : $tmpobject->model_pdf;
-			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref);
+			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
 			if ($result <= 0) {
 				throw new RestException(500, 'Error generating document');
@@ -323,7 +332,7 @@ class Documents extends DolibarrApi
 			}
 
 			$templateused = $doctemplate ? $doctemplate : $tmpobject->model_pdf;
-			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref);
+			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
 			if ($result <= 0) {
 				throw new RestException(500, 'Error generating document');
@@ -339,7 +348,7 @@ class Documents extends DolibarrApi
 			}
 
 			$templateused = $doctemplate ? $doctemplate : $tmpobject->model_pdf;
-			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref);
+			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
 			if ($result <= 0) {
 				throw new RestException(500, 'Error generating document');
@@ -355,7 +364,7 @@ class Documents extends DolibarrApi
 			}
 
 			$templateused = $doctemplate ? $doctemplate : $tmpobject->model_pdf;
-			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref);
+			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
 			if ($result <= 0) {
 				throw new RestException(500, 'Error generating document');
@@ -371,7 +380,7 @@ class Documents extends DolibarrApi
 			}
 
 			$templateused = $doctemplate ? $doctemplate : $tmpobject->model_pdf;
-			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref);
+			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
 			if ($result <= 0) {
 				throw new RestException(500, 'Error generating document');
@@ -419,7 +428,7 @@ class Documents extends DolibarrApi
 			}
 
 			$templateused = $doctemplate ? $doctemplate : $tmpobject->model_pdf;
-			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref);
+			$result = $tmpobject->generateDocument($templateused, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
 			if ($result <= 0) {
 				throw new RestException(500, 'Error generating document');
